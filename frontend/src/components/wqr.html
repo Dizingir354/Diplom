@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Объявления</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Навигационная панель -->
+        <nav class="sidebar">
+            <div class="logo">
+                <!-- Логотип или иконка -->
+                <div class="icon"></div>
+            </div>
+            <ul class="menu">
+                <li><a href="#">Объявления</a></li>
+                <li><a href="#">Мастера</a></li>
+                <li><a href="#">Игроки</a></li>
+            </ul>
+        </nav>
+
+        <!-- Основной контент -->
+        <div class="content">
+            <h1>Объявления</h1>
+            <div class="tabs">
+                <button class="tab active">Мастера</button>
+                <button class="tab">Игроки</button>
+            </div>
+
+            <!-- Сетка объявлений -->
+            <div class="grid">
+                <div class="card">
+                    <h2>Максим</h2>
+                    <p class="tags">Чт • Вт • DnD5e • Кампания • 18+</p>
+                    <p class="platform">Foundry VTT</p>
+                    <p class="description">
+                        Я - активный, любознательный, позитивный игрок...
+                    </p>
+                </div>
+
+                <!-- Повторяющиеся карточки -->
+                <div class="card">
+                    <h2>Освальд</h2>
+                    <p class="tags">Пн • Кампания • 16+ • Roll20</p>
+                    <p class="description">
+                        В основном водил по ДнД, дневнику авантюриста...
+                    </p>
+                </div>
+
+                <!-- Добавьте столько карточек, сколько нужно -->
+            </div>
+
+            <!-- Пагинация -->
+            <div class="pagination">
+                <button class="page-btn">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <span>...</span>
+                <button class="page-btn">15</button>
+                <button class="next-btn">→</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,8 +1,7 @@
-// src/services/mailService.js
 const nodemailer = require('nodemailer');
 const express = require('express');
 const router = express.Router();
-const mailController = require('../controllers/mailController');
+const mailController = require('../email/mailController');
 
 const transporter = nodemailer.createTransport({
     service: process.env.MAIL_SERVICE,

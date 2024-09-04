@@ -1,4 +1,4 @@
-const minioClient = require('../config/minioConfig');
+const minioClient = require('../minio/minioCongif');
 
 const bucketName = 'mybucket';
 

@@ -1,12 +1,13 @@
 version: '3'
 services:
   api:
-    build: ./api
+    build: ./backend/api
     ports:
       - '3000:3000'
     depends_on:
       - db
       - redis
+      - storage.minio
 
   db:
     image: postgres:latest
@@ -18,17 +19,16 @@ services:
   storage.minio:
     container_name: storage.minio
     build:
+      context: ./backend/storage
       dockerfile: Dockerfile
-      context: ./storage
     volumes:
-      - ./storage/uploads:/storage/uploads
+      - ./backend/storage/uploads:/storage/uploads
     ports:
       - "9000:9000"
       - "9001:9001"
     environment:
       MINIO_ROOT_USER: user
       MINIO_ROOT_PASSWORD: password
-
 
   redis:
     image: redis:latest
@@ -37,7 +37,7 @@ services:
     image: rabbitmq:latest
 
   notifications:
-    build: ./notifications
+    build: ./backend/notifications
     ports:
       - '4000:4000'
     depends_on:
