@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const Register = () => {
     const [name, setName] = useState('');
@@ -7,9 +8,12 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const [verificationCode, setVerificationCode] = useState('');
     const [codeSent, setCodeSent] = useState(false);
+    const [isSendingCode, setIsSendingCode] = useState(false); // Для управления кнопкой отправки кода
+    const [isRegistering, setIsRegistering] = useState(false); // Для управления кнопкой регистрации
 
     const sendVerificationCode = async () => {
         try {
+            setIsSendingCode(true);
             const response = await axios.post('/api/send-code', { email });
             if (response.data.success) {
                 setCodeSent(true);
@@ -20,12 +24,19 @@ const Register = () => {
         } catch (error) {
             console.error('Ошибка:', error);
             alert('Произошла ошибка.');
+        } finally {
+            setIsSendingCode(false);
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (password.length < 6) {
+            alert('Пароль должен содержать не менее 6 символов.');
+            return;
+        }
         try {
+            setIsRegistering(true);
             const response = await axios.post('/api/register', { name, email, password, code: verificationCode });
             if (response.data.success) {
                 alert('Регистрация успешна!');
@@ -35,6 +46,8 @@ const Register = () => {
         } catch (error) {
             console.error('Ошибка:', error);
             alert('Произошла ошибка.');
+        } finally {
+            setIsRegistering(false);
         }
     };
 
@@ -49,7 +62,9 @@ const Register = () => {
                 <div>
                     <label>Почта:</label>
                     <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                    <button type="button" onClick={sendVerificationCode}>Отправить код подтверждения</button>
+                    <button type="button" onClick={sendVerificationCode} disabled={isSendingCode || codeSent}>
+                        {isSendingCode ? 'Отправка...' : 'Отправить код подтверждения'}
+                    </button>
                 </div>
                 {codeSent && (
                     <div>
@@ -61,7 +76,9 @@ const Register = () => {
                     <label>Пароль:</label>
                     <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                 </div>
-                <button type="submit">Зарегистрироваться</button>
+                <button type="submit" disabled={isRegistering}>
+                    {isRegistering ? 'Регистрация...' : 'Зарегистрироваться'}
+                </button>
             </form>
         </div>
     );
