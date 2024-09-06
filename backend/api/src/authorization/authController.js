@@ -40,7 +40,7 @@ exports.register = async (req, res) => {
     const { name, email, password, code } = req.body;
 
     if (verificationCodes[email] !== code) {
-        return res.status(400).json({ success: false, message: 'Invalid verification code.' });
+        return res.status(401).json({ success: false, message: 'Invalid verification code.' });
     }
 
     // Проверка, существует ли пользователь
