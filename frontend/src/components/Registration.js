@@ -7,8 +7,8 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const [verificationCode, setVerificationCode] = useState('');
     const [codeSent, setCodeSent] = useState(false);
-    const [isSendingCode, setIsSendingCode] = useState(false); // Для управления кнопкой отправки кода
-    const [isRegistering, setIsRegistering] = useState(false); // Для управления кнопкой регистрации
+    const [isSendingCode, setIsSendingCode] = useState(false);
+    const [isRegistering, setIsRegistering] = useState(false);
 
     const sendVerificationCode = async () => {
         try {

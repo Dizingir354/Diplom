@@ -4,13 +4,13 @@ import { Link } from 'react-router-dom';
 const Profile = () => {
     return (
         <div>
-            <h1>Welcome to Your Profile</h1>
+            <h1>Добро пожаловать в ваш профиль</h1>
             <div>
                 <Link to="/register">
-                    <button>Register</button>
+                    <button>Регистрация</button>
                 </Link>
                 <Link to="/login">
-                    <button>Login</button>
+                    <button>Войти</button>
                 </Link>
             </div>
         </div>
