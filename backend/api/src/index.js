@@ -8,7 +8,7 @@ const authRoutes = require('./authorization/authRoutes');
 const app = express();
 app.use(bodyParser.json());
 
-// Подключение к MongoDB (если используется)
+// Подключение к MongoDB
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('MongoDB connection error:', err));

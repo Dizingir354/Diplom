@@ -1,13 +1,38 @@
-const User = require('../models/User');
+const User = require('../../db/models/User');
+const jwt = require('jsonwebtoken');
 
-exports.uploadAvatar = async (req, res) => {
-  const userId = req.userId; // Предполагается, что ID пользователя доступен после аутентификации
-  const avatarPath = req.file.path;
+// Регистрация нового пользователя
+exports.registerUser = async (req, res) => {
+    const { name, email, password } = req.body;
 
-  try {
-    await User.findByIdAndUpdate(userId, { avatar: avatarPath });
-    res.json({ message: 'Аватарка обновлена' });
-  } catch (error) {
-    res.status(500).json({ error: 'Ошибка при обновлении аватарки' });
-  }
+    try {
+        // Проверка, существует ли пользователь
+        const userExists = await User.findOne({ email });
+        if (userExists) {
+            return res.status(400).json({ message: 'Пользователь уже существует' });
+        }
+
+        // Создание нового пользователя
+        const user = await User.create({
+            name,
+            email,
+            password
+        });
+
+        res.status(201).json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            token: generateToken(user._id)
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Ошибка при регистрации' });
+    }
+};
+
+// Генерация токена JWT
+const generateToken = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET, {
+        expiresIn: '30d'
+    });
 };

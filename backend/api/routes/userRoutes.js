@@ -1,10 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const userController = require('../controllers/userController');
-const upload = require('../middleware/avatarUpload');
-const authMiddleware = require('../middleware/authMiddleware'); // Middleware для проверки токена
+const { registerUser } = require('../controllers/userController');
 
-// Загрузка аватарки
-router.post('/upload-avatar', authMiddleware, upload.single('avatar'), userController.uploadAvatar);
+// Маршрут для регистрации пользователя
+router.post('/register', registerUser);
 
 module.exports = router;
