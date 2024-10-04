@@ -1,40 +1,33 @@
 version: '3'
+
 services:
   api:
     build: ./backend/api
     ports:
       - '3000:3000'
+    volumes:
+      - ./backend/api:/usr/src/app
     depends_on:
-      - db
-      - redis
       - storage.minio
-
-  db:
-    image: postgres:latest
-    environment:
-      POSTGRES_DB: my_database
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      - redis
 
   storage.minio:
     container_name: storage.minio
-    build:
-      context: ./backend/storage
-      dockerfile: Dockerfile
+    image: minio/minio
     volumes:
       - ./backend/storage/uploads:/storage/uploads
     ports:
       - "9000:9000"
       - "9001:9001"
     environment:
-      MINIO_ROOT_USER: user
-      MINIO_ROOT_PASSWORD: password
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /storage
 
   redis:
     image: redis:latest
-
-  rabbitmq:
-    image: rabbitmq:latest
+    ports:
+      - "6379:6379"
 
   notifications:
     build: ./backend/notifications
