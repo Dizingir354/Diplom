@@ -1,49 +1,104 @@
+const { sendVerificationEmail } = require('../services/mailService');
 const fs = require('fs');
 const path = require('path');
 
-const usersFilePath = path.join(__dirname, 'users.json'); // Путь к файлу
+// Путь к файлу, где будут храниться пользователи (например, users.json в папке db)
+const usersFilePath = path.join(__dirname, '../db/users.json');
 
-app.post('/api/register', (req, res) => {
-    const { username, password } = req.body;
+// Функция для чтения файла с пользователями
+const readUsersFromFile = () => {
+    try {
+        const data = fs.readFileSync(usersFilePath, 'utf-8');
+        return JSON.parse(data);
+    } catch (error) {
+        console.error('Ошибка чтения файла пользователей:', error);
+        return [];
+    }
+};
 
-    // Проверяем, что имя пользователя и пароль переданы
-    if (!username || !password) {
-        return res.status(400).json({ error: 'Username and password are required' });
+// Функция для записи данных в файл пользователей
+const writeUsersToFile = (users) => {
+    try {
+        fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2), 'utf-8');
+    } catch (error) {
+        console.error('Ошибка записи файла пользователей:', error);
+    }
+};
+
+// Регистрация пользователя
+const registerUser = (req, res) => {
+    const { username, password, email } = req.body;
+
+    if (!username || !password || !email) {
+        return res.status(400).json({ message: 'Заполните все поля.' });
     }
 
-    // Читаем текущих пользователей из файла
-    fs.readFile(usersFilePath, 'utf8', (err, data) => {
-        if (err) {
-            console.error('Ошибка чтения файла:', err);
-            return res.status(500).json({ error: 'Internal server error' });
-        }
+    // Проверяем, существует ли пользователь с таким email
+    const users = readUsersFromFile();
+    const userExists = users.find(user => user.email === email);
 
-        let users = [];
-        try {
-            users = JSON.parse(data); // Парсим содержимое файла
-        } catch (e) {
-            console.error('Ошибка парсинга JSON:', e);
-            return res.status(500).json({ error: 'Internal server error' });
-        }
+    if (userExists) {
+        return res.status(400).json({ message: 'Пользователь с таким email уже существует.' });
+    }
 
-        // Проверяем, существует ли уже пользователь
-        const existingUser = users.find(user => user.username === username);
-        if (existingUser) {
-            return res.status(409).json({ error: 'User already exists' }); // Конфликт
-        }
+    // Генерация кода подтверждения
+    const verificationCode = Math.floor(100000 + Math.random() * 900000); // 6-значный код
 
-        // Добавляем нового пользователя
-        const newUser = { username, password };
-        users.push(newUser);
+    // Создаем нового пользователя (без верификации)
+    const newUser = {
+        username,
+        password,
+        email,
+        verificationCode,
+        isVerified: false // Устанавливаем isVerified на false до подтверждения
+    };
 
-        // Сохраняем обновленный список пользователей обратно в файл
-        fs.writeFile(usersFilePath, JSON.stringify(users, null, 2), (err) => {
-            if (err) {
-                console.error('Ошибка записи файла:', err);
-                return res.status(500).json({ error: 'Internal server error' });
-            }
-            console.log('Пользователь успешно сохранен в файл'); // Подтверждение успешного сохранения
-            res.status(201).json({ message: 'User registered successfully' });
+    // Добавляем пользователя в список
+    users.push(newUser);
+    writeUsersToFile(users);
+
+    // Отправляем письмо с кодом подтверждения
+    sendVerificationEmail(email, verificationCode)
+        .then(() => {
+            res.status(200).json({ message: 'Пользователь зарегистрирован. Код подтверждения отправлен на почту.' });
+        })
+        .catch(error => {
+            console.error('Ошибка при отправке письма:', error);
+            res.status(500).json({ message: 'Ошибка при отправке кода подтверждения.' });
         });
-    });
-});
+};
+
+// Подтверждение электронной почты
+const verifyEmail = (req, res) => {
+    const { email, verificationCode } = req.body;
+
+    if (!email || !verificationCode) {
+        return res.status(400).json({ message: 'Заполните все поля.' });
+    }
+
+    const users = readUsersFromFile();
+    const user = users.find(user => user.email === email);
+
+    if (!user) {
+        return res.status(400).json({ message: 'Пользователь не найден.' });
+    }
+
+    if (user.isVerified) {
+        return res.status(400).json({ message: 'Электронная почта уже подтверждена.' });
+    }
+
+    if (user.verificationCode !== verificationCode) {
+        return res.status(400).json({ message: 'Неправильный код подтверждения.' });
+    }
+
+    // Обновляем статус верификации пользователя
+    user.isVerified = true;
+    writeUsersToFile(users);
+
+    res.status(200).json({ message: 'Email успешно подтвержден.' });
+};
+
+module.exports = {
+    registerUser,
+    verifyEmail
+};

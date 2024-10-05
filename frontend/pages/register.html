@@ -3,16 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    <script src="/frontend/js/register.js" defer></script>
+    <title>Registration</title>
 </head>
 <body>
-    <h1>Register</h1>
-    <form id="registerForm">
-        <input type="text" id="username" placeholder="Username" required />
-        <input type="password" id="password" placeholder="Password" required />
+    <h1>Registration</h1>
+    <form id="registrationForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+
         <button type="submit">Register</button>
     </form>
-    <p id="message"></p>
+
+    <div id="verificationSection" style="display:none;">
+        <h2>Enter Verification Code</h2>
+        <form id="verificationForm">
+            <label for="verificationCode">Verification Code:</label>
+            <input type="text" id="verificationCode" name="verificationCode" required><br><br>
+
+            <button type="submit">Verify</button>
+        </form>
+    </div>
+
+    <script src="../js/register.js"></script>
 </body>
 </html>
