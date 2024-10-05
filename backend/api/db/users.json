@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "username": "345",
+    "password": "345",
+    "email": "Dizingir355@gmail.com",
+    "verificationCode": 268183,
+    "isVerified": false
+  },
+  {
+    "username": "123",
+    "password": "123",
+    "email": "qwer@gmail.com",
+    "verificationCode": 334669,
+    "isVerified": false
+  }
+]

@@ -1,65 +1,37 @@
-document.getElementById('registrationForm').addEventListener('submit', function (e) {
-  e.preventDefault();
+import { registerUser, verifyEmail } from './api.js'; // Убедитесь, что путь правильный
 
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-  const email = document.getElementById('email').value;
+const registrationForm = document.getElementById('registrationForm');
+const verifyButton = document.getElementById('verifyButton');
+const verificationSection = document.getElementById('verificationSection');
+const verificationCodeInput = document.getElementById('verificationCodeInput');
+const emailInput = document.getElementById('emailInput'); // Добавьте это поле для хранения email
 
-  fetch('/api/register', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ username, password, email })
-  })
-  .then(response => {
-      if (!response.ok) {
-          throw new Error('Network response was not ok');
-      }
-      return response.json();
-  })
-  .then(data => {
-      if (data.message === 'Пользователь зарегистрирован. Код подтверждения отправлен на почту.') {
-          alert(data.message);
-          document.getElementById('registrationForm').style.display = 'none';
-          document.getElementById('verificationSection').style.display = 'block';
-      } else {
-          alert(data.message);
-      }
-  })
-  .catch(error => {
-      console.error('Error:', error);
-  });
+registrationForm.addEventListener('submit', async function (event) {
+    event.preventDefault(); // Отменяем стандартное поведение формы
+
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const email = document.getElementById('email').value;
+
+    try {
+        const data = await registerUser(username, password, email);
+        alert(data.message);
+        verificationSection.style.display = 'block'; // Показываем секцию для кода
+    } catch (error) {
+        alert(error.message);
+    }
 });
 
-document.getElementById('verificationForm').addEventListener('submit', function (e) {
-  e.preventDefault();
+// Обработчик для проверки кода
+verifyButton.addEventListener('click', async function () {
+    const verificationCode = verificationCodeInput.value;
+    const email = emailInput.value; // Используем значение email
 
-  const email = document.getElementById('email').value;
-  const verificationCode = document.getElementById('verificationCode').value;
-
-  fetch('/api/verify-email', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email, verificationCode })
-  })
-  .then(response => {
-      if (!response.ok) {
-          throw new Error('Network response was not ok');
-      }
-      return response.json();
-  })
-  .then(data => {
-      if (data.message === 'Email успешно подтвержден.') {
-          alert(data.message);
-          window.location.href = '/login.html';  // Перенаправление на страницу входа
-      } else {
-          alert(data.message);
-      }
-  })
-  .catch(error => {
-      console.error('Error:', error);
-  });
+    try {
+        const data = await verifyEmail(email, verificationCode); // Используем правильный путь
+        alert(data.message);
+        verificationSection.style.display = 'none'; // Скрываем секцию
+    } catch (error) {
+        alert(error.message);
+    }
 });

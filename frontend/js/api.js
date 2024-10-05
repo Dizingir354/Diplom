@@ -1,23 +1,35 @@
 const API_BASE_URL = 'http://localhost:3000/api';
 
-async function register(username, password) {
+const registerUser = async (username, password, email) => {
     const response = await fetch(`${API_BASE_URL}/register`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ username, password, email })
     });
-    return response.json();
-}
 
-async function login(username, password) {
-    const response = await fetch(`${API_BASE_URL}/login`, {
+    if (!response.ok) {
+        throw new Error('Ошибка при регистрации пользователя');
+    }
+
+    return response.json();
+};
+
+const verifyEmail = async (email, verificationCode) => {
+    const response = await fetch(`${API_BASE_URL}/verify`, { // Убедитесь, что здесь правильный путь
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ email, verificationCode })
     });
+
+    if (!response.ok) {
+        throw new Error('Ошибка при подтверждении email');
+    }
+
     return response.json();
-}
+};
+
+export { registerUser, verifyEmail };

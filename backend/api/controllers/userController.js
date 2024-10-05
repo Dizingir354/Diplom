@@ -2,7 +2,6 @@ const { sendVerificationEmail } = require('../services/mailService');
 const fs = require('fs');
 const path = require('path');
 
-// Путь к файлу, где будут храниться пользователи (например, users.json в папке db)
 const usersFilePath = path.join(__dirname, '../db/users.json');
 
 // Функция для чтения файла с пользователями
@@ -33,7 +32,6 @@ const registerUser = (req, res) => {
         return res.status(400).json({ message: 'Заполните все поля.' });
     }
 
-    // Проверяем, существует ли пользователь с таким email
     const users = readUsersFromFile();
     const userExists = users.find(user => user.email === email);
 
@@ -44,20 +42,19 @@ const registerUser = (req, res) => {
     // Генерация кода подтверждения
     const verificationCode = Math.floor(100000 + Math.random() * 900000); // 6-значный код
 
-    // Создаем нового пользователя (без верификации)
     const newUser = {
         username,
         password,
         email,
         verificationCode,
-        isVerified: false // Устанавливаем isVerified на false до подтверждения
+        isVerified: false,
+        verificationCodeSentAt: Date.now() // Время отправки кода
     };
 
-    // Добавляем пользователя в список
     users.push(newUser);
     writeUsersToFile(users);
 
-    // Отправляем письмо с кодом подтверждения
+    // Отправка письма с кодом подтверждения
     sendVerificationEmail(email, verificationCode)
         .then(() => {
             res.status(200).json({ message: 'Пользователь зарегистрирован. Код подтверждения отправлен на почту.' });
@@ -91,7 +88,12 @@ const verifyEmail = (req, res) => {
         return res.status(400).json({ message: 'Неправильный код подтверждения.' });
     }
 
-    // Обновляем статус верификации пользователя
+    // Проверка времени отправки кода подтверждения
+    const tenMinutes = 10 * 60 * 1000; // 10 минут
+    if (Date.now() - user.verificationCodeSentAt > tenMinutes) {
+        return res.status(400).json({ message: 'Код подтверждения истек.' });
+    }
+
     user.isVerified = true;
     writeUsersToFile(users);
 
