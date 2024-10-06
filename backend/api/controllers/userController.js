@@ -45,9 +45,12 @@ const registerUser = (req, res) => {
 
     // Генерация кода подтверждения
     const verificationCode = Math.floor(100000 + Math.random() * 900000); // 6-значный код
+    const verificationCodeSentAt = Date.now(); // Время отправки кода
 
-    // Создание нового пользователя с использованием модели
+    // Создание нового пользователя
     const newUser = new User(username, password, email, false, verificationCode);
+    newUser.verificationCodeSentAt = verificationCodeSentAt; // Добавляем время отправки кода
+
     users.push(newUser);
     writeUsersToFile(users);
 
@@ -62,6 +65,7 @@ const registerUser = (req, res) => {
         });
 };
 
+
 // Подтверждение электронной почты
 const verifyEmail = (req, res) => {
     const { email, verificationCode } = req.body;
@@ -72,7 +76,7 @@ const verifyEmail = (req, res) => {
         return res.status(400).json({ message: 'Заполните все поля.' });
     }
 
-    const users = readUsersFromFile();
+    const users = readUsersFromFile();  // Читаем пользователей из файла
     const user = users.find(user => user.email.toLowerCase() === email.toLowerCase());
 
     if (!user) {
@@ -83,7 +87,8 @@ const verifyEmail = (req, res) => {
         return res.status(400).json({ message: 'Электронная почта уже подтверждена.' });
     }
 
-    if (user.verificationCode !== verificationCode) {
+    // Приводим код подтверждения к числу для корректного сравнения
+    if (user.verificationCode !== parseInt(verificationCode, 10)) {
         return res.status(400).json({ message: 'Неправильный код подтверждения.' });
     }
 
@@ -96,10 +101,12 @@ const verifyEmail = (req, res) => {
     // Обновление статуса пользователя
     user.isVerified = true;
     user.verificationCode = null; // Удаляем код после подтверждения
-    writeUsersToFile(users);
+    writeUsersToFile(users);  // Сохраняем обновленный массив пользователей
 
     res.status(200).json({ message: 'Email успешно подтвержден.' });
 };
+
+
 
 module.exports = {
     registerUser,

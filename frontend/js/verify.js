@@ -1,7 +1,8 @@
-document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+document.getElementById('verificationForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const email = document.getElementById('email').value;
+    const email = document.getElementById('email').value.toLowerCase();
+
     const verificationCode = document.getElementById('verificationCode').value;
 
     console.log('Отправка данных для верификации:', { email, verificationCode });
