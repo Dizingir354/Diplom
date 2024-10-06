@@ -1,37 +1,31 @@
-import { registerUser, verifyEmail } from './api.js'; // Убедитесь, что путь правильный
-
-const registrationForm = document.getElementById('registrationForm');
-const verifyButton = document.getElementById('verifyButton');
-const verificationSection = document.getElementById('verificationSection');
-const verificationCodeInput = document.getElementById('verificationCodeInput');
-const emailInput = document.getElementById('emailInput'); // Добавьте это поле для хранения email
-
-registrationForm.addEventListener('submit', async function (event) {
-    event.preventDefault(); // Отменяем стандартное поведение формы
+document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
 
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     const email = document.getElementById('email').value;
 
-    try {
-        const data = await registerUser(username, password, email);
-        alert(data.message);
-        verificationSection.style.display = 'block'; // Показываем секцию для кода
-    } catch (error) {
-        alert(error.message);
-    }
-});
-
-// Обработчик для проверки кода
-verifyButton.addEventListener('click', async function () {
-    const verificationCode = verificationCodeInput.value;
-    const email = emailInput.value; // Используем значение email
+    console.log('Отправка данных на сервер:', { username, password, email });
 
     try {
-        const data = await verifyEmail(email, verificationCode); // Используем правильный путь
+        const response = await fetch('http://localhost:3000/api/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password, email })
+        });
+
+        const data = await response.json();
+        console.log('Ответ сервера:', data);
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Ошибка регистрации');
+        }
+
         alert(data.message);
-        verificationSection.style.display = 'none'; // Скрываем секцию
     } catch (error) {
-        alert(error.message);
+        console.error('Ошибка:', error);
+        alert(`Ошибка: ${error.message}`);
     }
 });

@@ -17,7 +17,7 @@ const registerUser = async (username, password, email) => {
 };
 
 const verifyEmail = async (email, verificationCode) => {
-    const response = await fetch(`${API_BASE_URL}/verify`, { // Убедитесь, что здесь правильный путь
+    const response = await fetch(`${API_BASE_URL}/verify`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

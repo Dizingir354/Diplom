@@ -1,21 +1,21 @@
 const { sendVerificationEmail } = require('../services/mailService');
 const fs = require('fs');
 const path = require('path');
+const User = require('../db/models/User'); // Импортируем модель User
 
 const usersFilePath = path.join(__dirname, '../db/users.json');
 
-// Функция для чтения файла с пользователями
+// Функция для чтения и записи файла с пользователями
 const readUsersFromFile = () => {
     try {
         const data = fs.readFileSync(usersFilePath, 'utf-8');
-        return JSON.parse(data);
+        return JSON.parse(data || '[]'); // Если файл пустой
     } catch (error) {
         console.error('Ошибка чтения файла пользователей:', error);
         return [];
     }
 };
 
-// Функция для записи данных в файл пользователей
 const writeUsersToFile = (users) => {
     try {
         fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2), 'utf-8');
@@ -28,12 +28,16 @@ const writeUsersToFile = (users) => {
 const registerUser = (req, res) => {
     const { username, password, email } = req.body;
 
+    console.log('Полученные данные для регистрации:', { username, password, email });
+
     if (!username || !password || !email) {
         return res.status(400).json({ message: 'Заполните все поля.' });
     }
 
     const users = readUsersFromFile();
-    const userExists = users.find(user => user.email === email);
+
+    // Приводим email к нижнему регистру для сравнения
+    const userExists = users.find(user => user.email.toLowerCase() === email.toLowerCase());
 
     if (userExists) {
         return res.status(400).json({ message: 'Пользователь с таким email уже существует.' });
@@ -42,15 +46,8 @@ const registerUser = (req, res) => {
     // Генерация кода подтверждения
     const verificationCode = Math.floor(100000 + Math.random() * 900000); // 6-значный код
 
-    const newUser = {
-        username,
-        password,
-        email,
-        verificationCode,
-        isVerified: false,
-        verificationCodeSentAt: Date.now() // Время отправки кода
-    };
-
+    // Создание нового пользователя с использованием модели
+    const newUser = new User(username, password, email, false, verificationCode);
     users.push(newUser);
     writeUsersToFile(users);
 
@@ -69,12 +66,14 @@ const registerUser = (req, res) => {
 const verifyEmail = (req, res) => {
     const { email, verificationCode } = req.body;
 
+    console.log('Полученные данные для верификации:', { email, verificationCode });
+
     if (!email || !verificationCode) {
         return res.status(400).json({ message: 'Заполните все поля.' });
     }
 
     const users = readUsersFromFile();
-    const user = users.find(user => user.email === email);
+    const user = users.find(user => user.email.toLowerCase() === email.toLowerCase());
 
     if (!user) {
         return res.status(400).json({ message: 'Пользователь не найден.' });
@@ -94,7 +93,9 @@ const verifyEmail = (req, res) => {
         return res.status(400).json({ message: 'Код подтверждения истек.' });
     }
 
+    // Обновление статуса пользователя
     user.isVerified = true;
+    user.verificationCode = null; // Удаляем код после подтверждения
     writeUsersToFile(users);
 
     res.status(200).json({ message: 'Email успешно подтвержден.' });
