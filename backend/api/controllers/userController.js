@@ -106,9 +106,36 @@ const verifyEmail = (req, res) => {
     res.status(200).json({ message: 'Email успешно подтвержден.' });
 };
 
+// Логин пользователя
+const loginUser = (req, res) => {
+    const { email, password } = req.body;
 
+    console.log('Полученные данные для логина:', { email, password });
+
+    if (!email || !password) {
+        return res.status(400).json({ message: 'Заполните все поля.' });
+    }
+
+    const users = readUsersFromFile();
+    const user = users.find(user => user.email.toLowerCase() === email.toLowerCase());
+
+    if (!user) {
+        return res.status(400).json({ message: 'Пользователь не найден.' });
+    }
+
+    if (!user.isVerified) {
+        return res.status(400).json({ message: 'Электронная почта не подтверждена.' });
+    }
+
+    if (user.password !== password) {
+        return res.status(400).json({ message: 'Неправильный пароль.' });
+    }
+
+    res.status(200).json({ message: 'Вы успешно вошли в систему.' });
+};
 
 module.exports = {
     registerUser,
-    verifyEmail
+    verifyEmail,
+    loginUser
 };
