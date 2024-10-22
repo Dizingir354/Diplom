@@ -1,5 +1,4 @@
 version: '3'
-
 services:
   api:
     build: ./backend/api
@@ -8,26 +7,26 @@ services:
     volumes:
       - ./backend/api:/usr/src/app
     depends_on:
-      - storage.minio
+      - storage_minio
       - redis
 
-  storage.minio:
-    container_name: storage.minio
+  storage_minio:
+    container_name: storage_minio
     image: minio/minio
     volumes:
-      - ./backend/storage/uploads:/storage/uploads
+      - ./backend/api/db:/storage  # Убедись, что этот путь правильный
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - '9000:9000'
+      - '9001:9001'
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
-    command: server /storage
+    command: server /storage/uploads  # Если папка storage изменилась, скорректируй путь
 
   redis:
     image: redis:latest
     ports:
-      - "6379:6379"
+      - '6379:6379'
 
   notifications:
     build: ./backend/notifications

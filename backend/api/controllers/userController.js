@@ -1,6 +1,7 @@
 const { sendVerificationEmail } = require('../services/mailService');
 const fs = require('fs');
 const path = require('path');
+const minioClient = require('../services/minioService');
 const User = require('../db/models/User'); // Импортируем модель User
 
 const usersFilePath = path.join(__dirname, '../db/users.json');
@@ -134,8 +135,42 @@ const loginUser = (req, res) => {
     res.status(200).json({ message: 'Вы успешно вошли в систему.' });
 };
 
+const uploadAvatar = (req, res) => {
+    const { email } = req.body;
+
+    if (!req.file) {
+        return res.status(400).json({ message: 'Файл не загружен.' });
+    }
+
+    const users = readUsersFromFile();
+    const user = users.find(user => user.email.toLowerCase() === email.toLowerCase());
+
+    if (!user) {
+        return res.status(404).json({ message: 'Пользователь не найден.' });
+    }
+
+    // Генерация уникального имени файла для аватара
+    const avatarFileName = `avatar-${user.username}-${Date.now()}.png`;
+    const avatarFilePath = path.join('uploads', avatarFileName);
+
+    // Сохраняем файл в MinIO
+    minioClient.putObject('uploads', avatarFilePath, req.file.buffer, req.file.size, (err, etag) => {
+        if (err) {
+            console.error('Ошибка при загрузке файла в MinIO:', err);
+            return res.status(500).json({ message: 'Ошибка при загрузке файла.' });
+        }
+
+        // Сохраняем путь к аватару в пользовательском профиле
+        user.avatar = avatarFilePath;
+        writeUsersToFile(users);
+
+        res.status(200).json({ message: 'Аватар успешно загружен.', avatarUrl: `/storage/uploads/${avatarFileName}` });
+    });
+};
+
 module.exports = {
     registerUser,
     verifyEmail,
-    loginUser
+    loginUser,
+    uploadAvatar
 };
