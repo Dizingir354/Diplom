@@ -14,14 +14,14 @@ services:
     container_name: storage_minio
     image: minio/minio
     volumes:
-      - ./backend/api/db:/storage  # Убедись, что этот путь правильный
+      - ./backend/api/db:/storage
     ports:
       - '9000:9000'
       - '9001:9001'
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
-    command: server /storage/uploads  # Если папка storage изменилась, скорректируй путь
+    command: server /storage/uploads
 
   redis:
     image: redis:latest
