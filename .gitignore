@@ -10,6 +10,7 @@
 
 # production
 /frontend/build
+/db/storage/playerVacancies.json
 
 # misc
 .DS_Store

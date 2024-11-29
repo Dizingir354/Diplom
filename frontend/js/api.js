@@ -32,4 +32,18 @@ const verifyEmail = async (email, verificationCode) => {
     return response.json();
 };
 
-export { registerUser, verifyEmail };
+const createPlayerVacancy = async (playerName, description, preferredGenres) => {
+    const response = await fetch(`${API_BASE_URL}/player-vacancies`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ playerName, description, preferredGenres })
+    });
+
+    if (!response.ok) throw new Error('Ошибка при создании вакансии игрока');
+
+    return response.json();
+};
+
+export { registerUser, verifyEmail, createPlayerVacancy };

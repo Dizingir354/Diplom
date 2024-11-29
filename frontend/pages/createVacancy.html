@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/style.css">
+    <title>Создание вакансии игрока</title>
+</head>
+<body>
+    <h1>Создание вакансии игрока</h1>
+    <form id="vacancyForm">
+        <label for="playerName">Имя игрока:</label>
+        <input type="text" id="playerName" name="playerName" required>
+        
+        <label for="description">Описание:</label>
+        <textarea id="description" name="description" required></textarea>
+        
+        <label for="preferredGenres">Любимые жанры (через запятую):</label>
+        <input type="text" id="preferredGenres" name="preferredGenres" required>
+        
+        <button type="submit">Создать вакансию</button>
+    </form>
+    
+    <script type="module" src="../js/createVacancy.js"></script>
+</body>
+</html>

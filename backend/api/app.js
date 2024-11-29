@@ -6,6 +6,7 @@ const path = require('path');
 const userRoutes = require('./routes/userRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const chatSocket = require('./services/chatSocket');  // Подключаем WebSocket-сервис
+const playerVacancyRoutes = require('./routes/playerVacancyRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,6 +22,8 @@ app.use('/api/chat', chatRoutes);
 
 // Раздача статических файлов для аватаров
 app.use('/uploads', express.static(path.join(__dirname, 'db/storage/uploads')));
+
+app.use('/api/player-vacancies', playerVacancyRoutes);
 
 // Тестовый маршрут
 app.get('/', (req, res) => {
