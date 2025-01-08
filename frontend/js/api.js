@@ -50,4 +50,21 @@ const createPlayerVacancy = async (playerName, description, preferredGenres) => 
     return response.json();
 };
 
-export default { registerUser, verifyEmail, createPlayerVacancy };
+const createParty = async ({ title, description, genres, masters, players }) => {
+    const response = await fetch(`${API_BASE_URL}/parties`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ title, description, genres, masters, players })
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Ошибка при создании партии');
+    }
+
+    return response.json();
+};
+
+export default { registerUser, verifyEmail, createPlayerVacancy, createParty };

@@ -8,6 +8,7 @@ const chatRoutes = require('./routes/chatRoutes');
 const chatSocket = require('./services/chatSocket');  // Подключаем WebSocket-сервис
 const playerVacancyRoutes = require('./routes/playerVacancyRoutes');
 const mongoose = require('./services/db');
+const partyRoutes = require('./routes/partyRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,6 +28,7 @@ app.use('/api/chat', chatRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'db/storage/uploads')));
 
 app.use('/api/player-vacancies', playerVacancyRoutes);
+app.use('/api/parties', partyRoutes);
 
 // Тестовый маршрут
 app.get('/', (req, res) => {

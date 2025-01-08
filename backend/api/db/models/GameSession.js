@@ -1,4 +1,3 @@
-// backend/models/GameSession.js
 const mongoose = require('mongoose');
 
 // Схема партии
