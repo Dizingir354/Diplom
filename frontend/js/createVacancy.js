@@ -1,18 +1,34 @@
-import { createPlayerVacancy } from './api.js';
+// createVacancy.js
+import api from './api.js'; // импортируем весь объект
 
-document.getElementById('vacancyForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+console.log('createVacancy.js подключён');
 
-    const playerName = document.getElementById('playerName').value;
-    const description = document.getElementById('description').value;
-    const preferredGenres = document.getElementById('preferredGenres').value.split(',').map(genre => genre.trim());
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('vacancyForm');
+    const responseMessage = document.getElementById('responseMessage');
 
-    try {
-        const response = await createPlayerVacancy(playerName, description, preferredGenres);
-        alert('Вакансия успешно создана!');
-        console.log('Данные вакансии:', response);
-    } catch (error) {
-        console.error('Ошибка при создании вакансии:', error);
-        alert(`Ошибка: ${error.message}`);
-    }
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault(); // Останавливаем стандартное поведение формы
+
+        // Собираем данные из формы
+        const playerName = form.playerName.value.trim();
+        const description = form.description.value.trim();
+        const preferredGenres = form.preferredGenres.value.trim();
+
+        try {
+            // Вызываем API для создания вакансии
+            const result = await api.createPlayerVacancy(playerName, description, preferredGenres);
+
+            // Если успешно, показываем сообщение
+            responseMessage.textContent = 'Вакансия успешно создана!';
+            responseMessage.style.color = 'green';
+
+            // Очищаем форму
+            form.reset();
+        } catch (error) {
+            // Показываем сообщение об ошибке
+            responseMessage.textContent = `Ошибка: ${error.message}`;
+            responseMessage.style.color = 'red';
+        }
+    });
 });

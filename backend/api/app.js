@@ -7,6 +7,7 @@ const userRoutes = require('./routes/userRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const chatSocket = require('./services/chatSocket');  // Подключаем WebSocket-сервис
 const playerVacancyRoutes = require('./routes/playerVacancyRoutes');
+const mongoose = require('./services/db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,6 +16,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(express.json());
 
 // Подключаем роуты для пользователя и чата
 app.use('/api', userRoutes);

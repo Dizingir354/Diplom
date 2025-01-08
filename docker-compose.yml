@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 services:
   api:
     build: ./backend/api
@@ -7,14 +7,26 @@ services:
     volumes:
       - ./backend/api:/usr/src/app
     depends_on:
+      - mongo
       - storage_minio
       - redis
+
+  mongo:
+    image: mongo
+    container_name: mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./backend/api/db/mongodb-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
 
   storage_minio:
     container_name: storage_minio
     image: minio/minio
     volumes:
-      - ./backend/api/db:/storage
+      - ./services/minio:/storage
     ports:
       - '9000:9000'
       - '9001:9001'

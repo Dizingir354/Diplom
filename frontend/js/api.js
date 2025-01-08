@@ -1,3 +1,4 @@
+// api.js
 const API_BASE_URL = 'http://localhost:3000/api';
 
 const registerUser = async (username, password, email) => {
@@ -41,9 +42,12 @@ const createPlayerVacancy = async (playerName, description, preferredGenres) => 
         body: JSON.stringify({ playerName, description, preferredGenres })
     });
 
-    if (!response.ok) throw new Error('Ошибка при создании вакансии игрока');
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Ошибка при создании вакансии игрока');
+    }
 
     return response.json();
 };
 
-export { registerUser, verifyEmail, createPlayerVacancy };
+export default { registerUser, verifyEmail, createPlayerVacancy };

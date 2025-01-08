@@ -1,60 +1,38 @@
-const fs = require('fs');
-const path = require('path');
-
-const filePath = path.join(__dirname, '../db/storage/playerVacancies.json');
-
-// Чтение данных из файла
-const readData = () => {
-    if (!fs.existsSync(filePath)) {
-        fs.writeFileSync(filePath, JSON.stringify([]));
-    }
-    const data = fs.readFileSync(filePath, 'utf8');
-    return JSON.parse(data);
-};
-
-// Запись данных в файл
-const writeData = (data) => {
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-};
+const PlayerVacancy = require('../db/models/PlayerVacancy'); // Подключаем модель
 
 // Создать вакансию игрока
-exports.createVacancy = (req, res) => {
+exports.createVacancy = async (req, res) => {
     try {
         const { playerName, description, preferredGenres } = req.body;
 
-        const vacancies = readData();
-        const newVacancy = {
-            id: vacancies.length + 1,
+        const newVacancy = new PlayerVacancy({
             playerName,
             description,
             preferredGenres,
-            createdAt: new Date().toISOString(),
-        };
+        });
 
-        vacancies.push(newVacancy);
-        writeData(vacancies);
+        await newVacancy.save();
 
         res.status(201).json(newVacancy);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при создании вакансии' });
+        res.status(500).json({ error: 'Ошибка при создании вакансии', details: error.message });
     }
 };
 
 // Получить список всех вакансий игроков
-exports.getAllVacancies = (req, res) => {
+exports.getAllVacancies = async (req, res) => {
     try {
-        const vacancies = readData();
+        const vacancies = await PlayerVacancy.find(); // Получаем все вакансии из базы данных
         res.status(200).json(vacancies);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при получении списка вакансий' });
+        res.status(500).json({ error: 'Ошибка при получении списка вакансий', details: error.message });
     }
 };
 
 // Получить вакансию по ID
-exports.getVacancyById = (req, res) => {
+exports.getVacancyById = async (req, res) => {
     try {
-        const vacancies = readData();
-        const vacancy = vacancies.find(v => v.id === parseInt(req.params.id));
+        const vacancy = await PlayerVacancy.findById(req.params.id); // Ищем вакансию по ID
 
         if (!vacancy) {
             return res.status(404).json({ error: 'Вакансия не найдена' });
@@ -62,42 +40,35 @@ exports.getVacancyById = (req, res) => {
 
         res.status(200).json(vacancy);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при получении вакансии' });
+        res.status(500).json({ error: 'Ошибка при получении вакансии', details: error.message });
     }
 };
 
 // Обновить вакансию
-exports.updateVacancy = (req, res) => {
+exports.updateVacancy = async (req, res) => {
     try {
         const { playerName, description, preferredGenres } = req.body;
-        const vacancies = readData();
 
-        const index = vacancies.findIndex(v => v.id === parseInt(req.params.id));
-        if (index === -1) {
+        const updatedVacancy = await PlayerVacancy.findByIdAndUpdate(
+            req.params.id, // Ищем вакансию по ID
+            { playerName, description, preferredGenres }, // Обновляем только указанные поля
+            { new: true, runValidators: true } // Опция: вернуть обновленный объект и проверять поля
+        );
+
+        if (!updatedVacancy) {
             return res.status(404).json({ error: 'Вакансия не найдена' });
         }
 
-        const updatedVacancy = {
-            ...vacancies[index],
-            playerName: playerName || vacancies[index].playerName,
-            description: description || vacancies[index].description,
-            preferredGenres: preferredGenres || vacancies[index].preferredGenres,
-        };
-
-        vacancies[index] = updatedVacancy;
-        writeData(vacancies);
-
         res.status(200).json(updatedVacancy);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при обновлении вакансии' });
+        res.status(500).json({ error: 'Ошибка при обновлении вакансии', details: error.message });
     }
 };
 
 // Отправить приглашение игроку
-exports.sendInvitation = (req, res) => {
+exports.sendInvitation = async (req, res) => {
     try {
-        const vacancies = readData();
-        const vacancy = vacancies.find(v => v.id === parseInt(req.params.id));
+        const vacancy = await PlayerVacancy.findById(req.params.id); // Ищем вакансию по ID
 
         if (!vacancy) {
             return res.status(404).json({ error: 'Вакансия не найдена' });
@@ -106,6 +77,6 @@ exports.sendInvitation = (req, res) => {
         // Здесь можно реализовать логику приглашения
         res.status(200).json({ message: 'Приглашение отправлено' });
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при отправке приглашения' });
+        res.status(500).json({ error: 'Ошибка при отправке приглашения', details: error.message });
     }
 };

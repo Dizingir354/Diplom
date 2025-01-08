@@ -1,0 +1,4 @@
+docker stop mongo
+db.testCollection.find();
+db.testCollection.insert({ name: "test" });
+use test;
