@@ -1,17 +1,13 @@
-class User {
-    constructor(username, password, email, isVerified = false, verificationCode = null) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.isVerified = isVerified; // Статус подтверждения почты (по умолчанию false)
-        this.verificationCode = verificationCode; // Код для подтверждения email (по умолчанию null)
-    }
+const mongoose = require('mongoose');
 
-    // Метод для обновления статуса подтверждения
-    verifyEmail() {
-        this.isVerified = true;
-        this.verificationCode = null; // Код можно удалить после успешной верификации
-    }
-}
+const userSchema = new mongoose.Schema({
+    username: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    isVerified: { type: Boolean, default: false },
+    verificationCode: { type: Number },
+    verificationCodeSentAt: { type: Date }, // Для проверки времени жизни кода
+    avatar: { type: String } // Поле для хранения пути к аватару
+}, { timestamps: true });
 
-module.exports = User;
+module.exports = mongoose.model('User', userSchema);

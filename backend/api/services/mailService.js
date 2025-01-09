@@ -7,7 +7,7 @@ const transporter = nodemailer.createTransport({
   secure: true, // true для 465, false для других портов
   auth: {
       user: 'gamefounder@ukr.net',
-      pass: 'yrIAMGkY3cmVYHwP'
+      pass: 'hc1dSqWKVnTWnUDu'
   }
 });
 

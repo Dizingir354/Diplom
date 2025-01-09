@@ -24,6 +24,9 @@ document.getElementById('registrationForm').addEventListener('submit', async (e)
         }
 
         alert(data.message);
+
+        // Переход на страницу верификации
+        window.location.href = 'verify.html';
     } catch (error) {
         console.error('Ошибка:', error);
         alert(`Ошибка: ${error.message}`);
