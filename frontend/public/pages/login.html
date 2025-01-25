@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вхід</title>
+    <link rel="stylesheet" href="../css/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-bg">
+            <img src="../image/login/background.png" alt="Background">
+        </div>
+        <div class="login-form">
+            <h1>ВХІД</h1>
+            <p>Dice Roll – найповніше рішення для цифрової гри. Отримайте доступ до оголошень, ігрових кімнат, книг правил, гральних кісток та багато іншого.</p>
+            <form id="loginForm">
+                <label for="email">Пошта</label>
+                <input type="email" id="email" name="email" placeholder="Ваш email" required>
+                
+                <label for="password">Пароль</label>
+                <input type="password" id="password" name="password" placeholder="Ваш пароль" required>
+                
+                <div class="button-container">
+                    <button type="submit" class="button red">ВХІД</button>
+                    <a href="register.html" class="button black">РЕЄСТРАЦІЯ</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="/frontend/src/js/login.js"></script>
+</body>
+</html>

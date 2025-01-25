@@ -1,0 +1,245 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    color: #fff;
+    font-family: 'Ponter', sans-serif; /* Применение шрифта Ponter ко всему тексту */
+}
+
+.highlight, 
+h2 span.highlight, 
+p span.highlight {
+    color: #FF0000; /* Красный цвет для выделенных слов */
+}
+
+.hero-section {
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 50px;
+}
+
+.logo img {
+    height: 50px;
+}
+
+.auth-links a {
+    color: #fff;
+    text-decoration: none;
+    margin-left: 20px;
+    font-size: 16px;
+}
+
+.auth-links a:hover {
+    text-decoration: underline;
+}
+
+.hero-content {
+    position: absolute; /* Устанавливаем абсолютное позиционирование */
+    top: 50%; /* Центруем по вертикали */
+    left: 50px; /* Отступ от левого края */
+    transform: translateY(-50%); /* Центруем текст относительно вертикальной оси */
+    text-align: left; /* Выравниваем текст внутри блока по левому краю */
+    max-width: 500px; /* Ограничиваем ширину текстового блока */
+}
+
+.hero-content h1 {
+    font-size: 50px;
+    font-weight: bold; /* Делаем текст жирным */
+    margin-bottom: 20px;
+    line-height: 1.2;
+    font-family: 'Ponter', sans-serif; /* Шрифт Ponter */
+}
+
+
+
+.hero-content p {
+    font-size: 18px;
+    margin-bottom: 50px; /* Добавляем больше отступа снизу */
+}
+
+.btn-main {
+    background-color: #FF0000;
+    color: #fff;
+    text-decoration: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    border-radius: 5px;
+    margin-top: 20px; /* Отступ сверху кнопки */
+}
+
+.btn-main:hover {
+    background-color: #FF0000;
+}
+
+.games-section {
+    background-color: #111111; /* Тёмный фон */
+    padding: 20px 0; /* Отступы сверху и снизу */
+    display: flex;
+    justify-content: center; /* Центровка контейнера с логотипами */
+}
+
+.games-container {
+    display: flex;
+    justify-content: space-evenly; /* Равномерное распределение логотипов по строке */
+    width: 100%; /* Используем всю ширину строки */
+    max-width: 1200px; /* Ограничиваем максимальную ширину секции */
+    gap: 20px; /* Увеличенный пробел между логотипами */
+}
+
+.games-container img {
+    max-height: 70px; /* Максимальная высота логотипов */
+    object-fit: contain; /* Сохраняем пропорции внутри своих рамок */
+    padding: 0 10px; /* Небольшие внутренние отступы */
+    flex-shrink: 0; /* Не даём логотипам уменьшаться слишком сильно */
+}
+
+.features-section {
+    background-image: url('../image/home/background.png'); /* Фон всей секции */
+    background-size: cover; /* Растянуть фон на всю секцию */
+    background-position: center;
+    padding: 50px 20px; /* Отступы секции */
+    display: flex;
+    flex-direction: column;
+    gap: 40px; /* Расстояние между блоками */
+}
+
+.features-section {
+    background-image: url('../image/home/background.png'); /* Фон всей секции */
+    background-size: cover;
+    background-position: center;
+    padding: 50px 20px; /* Отступы секции */
+    display: flex;
+    flex-direction: column;
+    gap: 40px; /* Расстояние между блоками */
+    background-color: rgba(17, 17, 17, 1); /* Полупрозрачный фон */
+}
+
+.feature {
+    display: flex;
+    align-items: center; /* Вертикальное выравнивание */
+    padding: 20px;
+    background: rgba(17, 17, 17, 0.9); /* Полупрозрачный фон для текстовых блоков */
+    border-radius: 10px; /* Закруглённые углы */
+    color: #fff; /* Белый цвет текста */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Тень */
+}
+
+.feature:nth-child(odd) {
+    flex-direction: row-reverse; /* Текст справа, изображение слева */
+}
+
+.feature:nth-child(even) {
+    flex-direction: row; /* Текст слева, изображение справа */
+}
+
+.feature img {
+    max-width: 40%; /* Ограничение размера изображений */
+    height: auto;
+    border-radius: 10px; /* Закруглённые углы для картинок */
+    margin: 0 20px; /* Отступы между картинкой и текстом */
+}
+
+.feature h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-family: 'Ponter', sans-serif;
+}
+
+.feature p {
+    font-size: 16px;
+    line-height: 1.5;
+    font-family: 'Ponter', sans-serif;
+}
+
+.footer {
+    background-image: url('../image/home/background.png'); /* Фон-картинка */
+    background-size: cover;
+    background-position: center;
+    text-align: center; /* Центровка текста */
+    padding: 50px 20px;
+    color: #fff; /* Белый текст */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 600px; /* Увеличенная высота */
+    background-color: rgba(17, 17, 17, 1); /* Полупрозрачный чёрный фон */
+}
+
+.footer p {
+    font-size: 36px; /* Увеличенный размер текста */
+    font-weight: bold;
+    margin-bottom: 30px; /* Расстояние между текстом и кнопкой */
+    font-family: 'Ponter', sans-serif;
+}
+
+.footer .button {
+    background-color: #ff3f3f;
+    color: #fff;
+    text-decoration: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.footer .button:hover {
+    background-color: #d73737;
+}
+
+.footer-bottom {
+    background-color: rgba(0, 0, 0, 1); /* Полупрозрачный чёрный */
+    color: #fff;
+    padding: 30px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.footer-container {
+    display: flex;
+    flex-direction: row; /* Располагает элементы в строку */
+    justify-content: space-between; /* Равномерное распределение */
+    align-items: center;
+    max-width: 1200px;
+    width: 100%;
+}
+
+.footer-logo img {
+    height: 60px; /* Размер логотипа */
+}
+
+.footer-text {
+    flex: 1; /* Текст занимает оставшееся место */
+    padding: 0 20px;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.footer-socials {
+    display: flex;
+    gap: 20px; /* Промежутки между иконками */
+}
+
+.footer-socials a img {
+    height: 30px; /* Размер иконок */
+    transition: transform 0.3s ease;
+}
+
+.footer-socials a img:hover {
+    transform: scale(1.2); /* Увеличение при наведении */
+}
+

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="../css/register.css">
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-bg">
+            <img src="../image/register/background.png" alt="Background">
+        </div>
+        <div class="register-form">
+            <h1>РЕЄСТРАЦІЯ</h1>
+            <p>Dice Roll – найповніше рішення для цифрової гри. Отримайте доступ до оголошень, ігрових кімнат, книг правил, гральних кісток та багато іншого.</p>
+            <form id="registrationForm">
+                <label for="username">Ім'я</label>
+                <input type="text" id="username" name="username" placeholder="Ваше ім'я" required>
+                
+                <label for="email">Пошта</label>
+                <input type="email" id="email" name="email" placeholder="Ваш email" required>
+                
+                <label for="password">Пароль</label>
+                <input type="password" id="password" name="password" placeholder="Ваш пароль" required>
+                
+                <label for="confirmPassword">Підтвердити пароль</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Повторіть пароль" required>
+                
+                <div class="button-container">
+                    <button type="submit" class="button red">РЕЄСТРАЦІЯ</button>
+                    <button type="button" class="button black">ВХІД</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="/frontend/src/js/register.js"></script>
+</body>
+</html>

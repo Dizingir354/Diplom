@@ -1,0 +1,54 @@
+/* Общие стили для контейнера чата */
+.chat-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+/* Заголовок чата */
+.chat-container h2 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+/* Окно сообщений */
+.chat-messages {
+    border: 1px solid #ccc;
+    padding: 10px;
+    overflow-y: auto;
+    height: 400px;
+    margin-bottom: 10px;
+    background-color: #ffffff;
+    border-radius: 4px;
+}
+
+/* Поле ввода сообщения */
+#chat-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+    font-size: 16px;
+}
+
+/* Стили для сообщений */
+.chat-message {
+    text-align: left;
+    margin-bottom: 8px;
+}
+
+.chat-message .username {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.chat-message .text {
+    color: #333;
+    font-size: 14px;
+}

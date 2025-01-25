@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+</head>
+<body>
+    <h1>Profile</h1>
+
+    <div>
+        <h2>Avatar</h2>
+        <img id="avatar" src="" alt="User Avatar" width="150" height="150">
+    </div>
+
+    <form id="avatarForm" enctype="multipart/form-data">
+        <input type="file" name="avatar" accept="image/*" required>
+        <input type="hidden" name="email" value="user_email@example.com">
+        <button type="submit">Upload Avatar</button>
+    </form>
+
+    <script>
+        const avatarForm = document.getElementById('avatarForm');
+        const avatarImg = document.getElementById('avatar');
+
+        avatarForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(avatarForm);
+
+            const response = await fetch('/api/upload-avatar', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                avatarImg.src = result.avatarUrl; // Обновляем аватар на странице
+            } else {
+                alert(result.message);
+            }
+        });
+
+        // Предзагрузка текущего аватара
+        fetch('/api/user/profile?email=user_email@example.com')
+            .then(res => res.json())
+            .then(data => {
+                if (data.avatarUrl) {
+                    avatarImg.src = data.avatarUrl;
+                }
+            });
+    </script>
+</body>
+</html>

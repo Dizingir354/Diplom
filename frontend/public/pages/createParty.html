@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/style.css">
+    <title>Создание партии</title>
+</head>
+<body>
+    <form id="partyForm">
+        <h1>Создание партии</h1>
+
+        <label for="title">Название партии:</label>
+        <input type="text" id="title" name="title" placeholder="Введите название партии" required>
+
+        <label for="description">Описание:</label>
+        <textarea id="description" name="description" placeholder="Опишите партию и её цели" required></textarea>
+
+        <label for="genres">Жанры (через запятую):</label>
+        <input type="text" id="genres" name="genres" placeholder="Например: фэнтези, хоррор, детектив" required>
+
+        <label for="masters">Мастера (через запятую):</label>
+        <input type="text" id="masters" name="masters" placeholder="Введите имена мастеров" required>
+
+        <label for="players">Игроки (через запятую):</label>
+        <input type="text" id="players" name="players" placeholder="Введите имена игроков">
+
+        <button type="submit">Создать партию</button>
+
+        <div id="responseMessage"></div>
+    </form>
+
+    <script type="module" src="../js/createParty.js"></script>
+</body>
+</html>
