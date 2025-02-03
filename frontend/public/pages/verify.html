@@ -3,20 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../css/style.css">
-    <title>Подтверждение</title>
+    <link rel="stylesheet" href="../css/verify.css">
+    <title>Підтвердження пошти</title>
 </head>
-<body>
-    <h1>Подтверждение</h1>
-    <form id="verificationForm">
-        <label for="email">Введите ваш email:</label>
-        <input type="email" id="email" name="email" required>
+<body class="verify-body">
+    <div class="verify-box">
+        <h1>ПІДТВЕРДЖЕННЯ ПОШТИ</h1>
+        <p>Ми надіслали код підтвердження на вашу електронну пошту. Введіть його нижче, щоб продовжити.</p>
+        <form id="verificationForm">
+            <label for="email">Електронна пошта</label>
+            <input type="email" id="email" name="email" placeholder="Введіть вашу пошту" required>
 
-        <label for="verificationCode">Введите код подтверждения:</label>
-        <input type="text" id="verificationCode" name="verificationCode" required>
-        
-        <button type="submit">Подтвердить</button>
-    </form>
+            <label for="code">Код підтвердження</label>
+            <input type="text" id="code" name="code" placeholder="Введіть код" required>
+
+            <button type="submit" class="verify-button">ПІДТВЕРДИТИ</button>
+        </form>
+    </div>
 
     <script src="../js/verify.js"></script>
 </body>

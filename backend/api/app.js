@@ -27,6 +27,8 @@ app.use('/api/chat', chatRoutes);
 // Раздача статических файлов для аватаров
 app.use('/uploads', express.static(path.join(__dirname, 'db/storage/uploads')));
 
+app.use('/frontend', express.static(path.join(__dirname, 'frontend')));
+
 app.use('/api/player-vacancies', playerVacancyRoutes);
 app.use('/api/parties', partyRoutes);
 
