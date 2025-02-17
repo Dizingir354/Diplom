@@ -3,21 +3,23 @@ const PlayerVacancy = require('../db/models/PlayerVacancy'); // Подключа
 // Создать вакансию игрока
 exports.createVacancy = async (req, res) => {
     try {
-        const { playerName, description, preferredGenres } = req.body;
+        const { playerName, description, gameSystem, preferredGenres, tags } = req.body;
 
         const newVacancy = new PlayerVacancy({
             playerName,
             description,
+            gameSystem,
             preferredGenres,
+            tags,
         });
 
         await newVacancy.save();
-
         res.status(201).json(newVacancy);
     } catch (error) {
         res.status(500).json({ error: 'Ошибка при создании вакансии', details: error.message });
     }
 };
+
 
 // Получить список всех вакансий игроков
 exports.getAllVacancies = async (req, res) => {
@@ -47,12 +49,12 @@ exports.getVacancyById = async (req, res) => {
 // Обновить вакансию
 exports.updateVacancy = async (req, res) => {
     try {
-        const { playerName, description, preferredGenres } = req.body;
+        const { playerName, description, gameSystem, preferredGenres, tags } = req.body;
 
         const updatedVacancy = await PlayerVacancy.findByIdAndUpdate(
-            req.params.id, // Ищем вакансию по ID
-            { playerName, description, preferredGenres }, // Обновляем только указанные поля
-            { new: true, runValidators: true } // Опция: вернуть обновленный объект и проверять поля
+            req.params.id,
+            { playerName, description, gameSystem, preferredGenres, tags },
+            { new: true, runValidators: true }
         );
 
         if (!updatedVacancy) {
@@ -64,6 +66,7 @@ exports.updateVacancy = async (req, res) => {
         res.status(500).json({ error: 'Ошибка при обновлении вакансии', details: error.message });
     }
 };
+
 
 // Отправить приглашение игроку
 exports.sendInvitation = async (req, res) => {
