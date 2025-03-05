@@ -29,7 +29,7 @@ const ProfilePage = () => {
       <button onClick={() => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-        navigate("/login");
+        navigate("/");  // Перенаправление на главную страницу
       }} className="button red">
         Вийти
       </button>

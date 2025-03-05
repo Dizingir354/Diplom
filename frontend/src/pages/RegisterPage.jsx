@@ -49,6 +49,9 @@ const RegisterPage = () => {
         throw new Error(data.message || "Ошибка регистрации");
       }
 
+      // Сохраняем email в localStorage после успешной регистрации
+      localStorage.setItem("email", formData.email);
+
       alert(data.message);
       window.location.href = "/verify";
     } catch (error) {

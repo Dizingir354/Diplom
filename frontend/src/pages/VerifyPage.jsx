@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const VerifyPage = () => {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
+
+  useEffect(() => {
+    document.getElementById("page-style").setAttribute("href", "/css/verify.css"); // Устанавливаем стили для страницы верификации
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,7 +28,9 @@ const VerifyPage = () => {
         throw new Error(data.message || "Ошибка верификации");
       }
 
-      alert(data.message);
+      // Сохраняем токен в localStorage
+      localStorage.setItem("token", data.token);
+      window.location.href = "/profile"; // Перенаправляем на страницу профиля
     } catch (error) {
       console.error("Ошибка:", error);
       alert(`Ошибка: ${error.message}`);

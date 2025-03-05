@@ -1,3 +1,11 @@
+/* Убираем отступы и поле вокруг body */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+}
+
 /* Закрашиваем фон в #111 */
 .verify-body {
     display: flex;
@@ -9,6 +17,7 @@
     padding: 0;
     background-color: #111;
 }
+
 
 /* Основной контейнер */
 .verify-box {
@@ -65,4 +74,12 @@
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
+}
+
+.verify-button:hover {
+    background: #d33; /* Немного темнее при наведении */
+}
+
+.verify-button:focus {
+    outline: none;
 }
