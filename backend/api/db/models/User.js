@@ -6,8 +6,8 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     isVerified: { type: Boolean, default: false },
     verificationCode: { type: Number },
-    verificationCodeSentAt: { type: Date }, // Для проверки времени жизни кода
-    avatar: { type: String } // Поле для хранения пути к аватару
+    verificationCodeSentAt: { type: Date },
+    verificationExpires: { type: Date }, // Время истечения кода подтверждения
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

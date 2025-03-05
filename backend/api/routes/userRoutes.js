@@ -1,22 +1,11 @@
 const express = require('express');
-const multer = require('multer');
-const { registerUser, verifyEmail, loginUser, uploadAvatar} = require('../controllers/userController');
+const { registerUser, verifyEmail, loginUser } = require('../controllers/userController');
+const { validateRegistration, validateLogin, validateEmailVerification } = require('../middlewares/validationMiddleware');
+
 const router = express.Router();
 
-// Конфигурация multer для загрузки файлов
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
-
-// Регистрация пользователя
-router.post('/register', registerUser);
-
-// Подтверждение электронной почты
-router.post('/verify', verifyEmail);
-
-// Логин пользователя
-router.post('/login', loginUser);
-
-// Маршрут для загрузки аватара
-router.post('/upload-avatar', upload.single('avatar'), uploadAvatar);
+router.post('/register', validateRegistration, registerUser);
+router.post('/login', validateLogin, loginUser);
+router.post('/verify', validateEmailVerification, verifyEmail);
 
 module.exports = router;

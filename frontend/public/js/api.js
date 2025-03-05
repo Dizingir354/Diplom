@@ -1,70 +1,70 @@
-// api.js
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = "http://localhost:3000/api";
 
-const registerUser = async (username, password, email) => {
-    const response = await fetch(`${API_BASE_URL}/register`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username, password, email })
-    });
+// Получаем токен из localStorage
+const getToken = () => localStorage.getItem("token");
 
-    if (!response.ok) {
-        throw new Error('Ошибка при регистрации пользователя');
+const request = async (url, options = {}) => {
+    const token = getToken();
+    const headers = {
+        "Content-Type": "application/json",
+        ...options.headers,
+    };
+
+    if (token) {
+        headers.Authorization = `Bearer ${token}`;
     }
 
-    return response.json();
-};
-
-const verifyEmail = async (email, verificationCode) => {
-    const response = await fetch(`${API_BASE_URL}/verify`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, verificationCode })
+    const response = await fetch(`${API_BASE_URL}${url}`, {
+        ...options,
+        headers,
     });
 
-    if (!response.ok) {
-        throw new Error('Ошибка при подтверждении email');
+    // Если токен истёк или недействителен — выходим
+    if (response.status === 401) {
+        logoutUser(); 
+        throw new Error("Сессия истекла, выполните вход заново.");
     }
 
-    return response.json();
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.message || "Ошибка запроса");
+    }
+
+    return data;
 };
 
+
+// Регистрация
+const registerUser = (username, password, email) =>
+    request("/register", {
+        method: "POST",
+        body: JSON.stringify({ username, password, email }),
+    });
+
+// Авторизация (вход)
+const loginUser = async (email, password) => {
+    const data = await request("/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+    });
+
+    // Сохраняем токен
+    localStorage.setItem("token", data.token);
+    return data;
+};
+
+// Выход
+const logoutUser = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+};
+
+// Создание вакансии игрока (пример запроса с токеном)
 const createPlayerVacancy = async (playerName, description, preferredGenres) => {
-    const response = await fetch(`${API_BASE_URL}/player-vacancies`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ playerName, description, preferredGenres })
+    return request("/player-vacancies", {
+        method: "POST",
+        body: JSON.stringify({ playerName, description, preferredGenres }),
     });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Ошибка при создании вакансии игрока');
-    }
-
-    return response.json();
 };
 
-const createParty = async ({ title, description, genres, masters, players }) => {
-    const response = await fetch(`${API_BASE_URL}/parties`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ title, description, genres, masters, players })
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Ошибка при создании партии');
-    }
-
-    return response.json();
-};
-
-export default { registerUser, verifyEmail, createPlayerVacancy, createParty };
+export default { registerUser, loginUser, logoutUser, createPlayerVacancy };

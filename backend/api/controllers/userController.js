@@ -1,13 +1,15 @@
+require('dotenv').config();
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const User = require('../db/models/User');
 const { sendVerificationEmail } = require('../services/mailService');
 
-// Регистрация пользователя
+const JWT_SECRET = process.env.JWT_SECRET;
+const TOKEN_EXPIRATION = process.env.TOKEN_EXPIRATION;
+
+// 📌 Регистрация пользователя
 const registerUser = async (req, res) => {
     const { username, password, email } = req.body;
-
-    if (!username || !password || !email) {
-        return res.status(400).json({ message: 'Заполните все поля.' });
-    }
 
     try {
         const existingUser = await User.findOne({ email: email.toLowerCase() });
@@ -15,36 +17,37 @@ const registerUser = async (req, res) => {
             return res.status(400).json({ message: 'Пользователь с таким email уже существует.' });
         }
 
-        // Генерация кода подтверждения
-        const verificationCode = Math.floor(100000 + Math.random() * 900000);
+        // Хэшируем пароль перед сохранением
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Создание нового пользователя
+        // Генерация кода подтверждения (на 30 дней)
+        const verificationCode = Math.floor(100000 + Math.random() * 900000);
+        const verificationExpires = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 дней
+
         const newUser = new User({
             username,
-            password,
+            password: hashedPassword,
             email: email.toLowerCase(),
             verificationCode,
             verificationCodeSentAt: Date.now(),
+            verificationExpires
         });
 
         await newUser.save();
 
-        // Отправка письма с кодом подтверждения
+        // Отправляем код на почту
         await sendVerificationEmail(email, verificationCode);
+
         res.status(200).json({ message: 'Пользователь зарегистрирован. Код подтверждения отправлен на почту.' });
     } catch (error) {
-        console.error('Ошибка при регистрации пользователя:', error);
+        console.error('Ошибка при регистрации:', error);
         res.status(500).json({ message: 'Ошибка сервера.' });
     }
 };
 
-// Подтверждение email
+// 📌 Подтверждение email
 const verifyEmail = async (req, res) => {
     const { email, verificationCode } = req.body;
-
-    if (!email || !verificationCode) {
-        return res.status(400).json({ message: 'Заполните все поля.' });
-    }
 
     try {
         const user = await User.findOne({ email: email.toLowerCase() });
@@ -56,9 +59,8 @@ const verifyEmail = async (req, res) => {
             return res.status(400).json({ message: 'Электронная почта уже подтверждена.' });
         }
 
-        const tenMinutes = 10 * 60 * 1000; // 10 минут
-        if (Date.now() - user.verificationCodeSentAt > tenMinutes) {
-            return res.status(400).json({ message: 'Код подтверждения истек.' });
+        if (Date.now() > user.verificationExpires) {
+            return res.status(400).json({ message: 'Код подтверждения истёк.' });
         }
 
         if (user.verificationCode !== parseInt(verificationCode, 10)) {
@@ -76,13 +78,9 @@ const verifyEmail = async (req, res) => {
     }
 };
 
-// Логин пользователя
+// 📌 Логин пользователя с JWT
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-        return res.status(400).json({ message: 'Заполните все поля.' });
-    }
 
     try {
         const user = await User.findOne({ email: email.toLowerCase() });
@@ -94,43 +92,21 @@ const loginUser = async (req, res) => {
             return res.status(400).json({ message: 'Электронная почта не подтверждена.' });
         }
 
-        if (user.password !== password) { // Здесь стоит заменить на хэширование пароля
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
             return res.status(400).json({ message: 'Неправильный пароль.' });
         }
 
-        res.status(200).json({ message: 'Вы успешно вошли в систему.' });
+        // Генерируем JWT-токен
+        const token = jwt.sign(
+            { userId: user._id, email: user.email },
+            JWT_SECRET,
+            { expiresIn: TOKEN_EXPIRATION }
+        );
+
+        res.status(200).json({ message: 'Вы успешно вошли в систему.', token });
     } catch (error) {
         console.error('Ошибка при входе:', error);
-        res.status(500).json({ message: 'Ошибка сервера.' });
-    }
-};
-
-// Загрузка аватара
-const uploadAvatar = async (req, res) => {
-    const { email } = req.body;
-
-    if (!req.file) {
-        return res.status(400).json({ message: 'Файл не загружен.' });
-    }
-
-    try {
-        const user = await User.findOne({ email: email.toLowerCase() });
-        if (!user) {
-            return res.status(404).json({ message: 'Пользователь не найден.' });
-        }
-
-        // Генерация уникального имени файла
-        const avatarFileName = `avatar-${user.username}-${Date.now()}.png`;
-        const avatarFilePath = path.join('uploads', avatarFileName);
-
-        // Сохранение файла
-        fs.writeFileSync(avatarFilePath, req.file.buffer);
-        user.avatar = avatarFilePath;
-        await user.save();
-
-        res.status(200).json({ message: 'Аватар успешно загружен.', avatarPath: avatarFilePath });
-    } catch (error) {
-        console.error('Ошибка при загрузке аватара:', error);
         res.status(500).json({ message: 'Ошибка сервера.' });
     }
 };
@@ -138,6 +114,5 @@ const uploadAvatar = async (req, res) => {
 module.exports = {
     registerUser,
     verifyEmail,
-    loginUser,
-    uploadAvatar
+    loginUser
 };
