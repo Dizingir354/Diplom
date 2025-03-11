@@ -11,7 +11,7 @@ const VerifyPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Отправка данных для верификации:", { email, code });
-
+  
     try {
       const response = await fetch("http://localhost:3000/api/verify", {
         method: "POST",
@@ -20,22 +20,29 @@ const VerifyPage = () => {
         },
         body: JSON.stringify({ email, verificationCode: code }),
       });
-
+  
       const data = await response.json();
       console.log("Ответ сервера:", data);
-
+  
       if (!response.ok) {
         throw new Error(data.message || "Ошибка верификации");
       }
-
-      // Сохраняем токен в localStorage
+  
+      // Сохраняем токен и данные пользователя (email, username, id)
       localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify({
+        email: data.email,
+        username: data.username,
+        userId: data.userId,  // Сохраняем userId
+      }));
+  
       window.location.href = "/profile"; // Перенаправляем на страницу профиля
     } catch (error) {
       console.error("Ошибка:", error);
       alert(`Ошибка: ${error.message}`);
     }
   };
+  
 
   return (
     <div className="verify-body">

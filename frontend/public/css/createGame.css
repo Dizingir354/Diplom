@@ -1,0 +1,33 @@
+.create-game-container {
+  padding: 20px;
+  color: white;
+  background: #222;
+  border-radius: 10px;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tag-button {
+  background: gray;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.tag-button.active {
+  border: 2px solid red;
+}
+
+.submit-button {
+  background: red;
+  border: none;
+  padding: 15px;
+  margin-top: 20px;
+  color: white;
+  cursor: pointer;
+}
+

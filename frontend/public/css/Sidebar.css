@@ -1,0 +1,51 @@
+.sidebar {
+  width: 80px;
+  height: 100vh; /* Растягиваем меню на всю высоту экрана */
+  background-color: #181818;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  position: fixed; /* Фиксируем сбоку */
+  left: 0;
+  top: 0;
+}
+
+.sidebar-logo img {
+  width: 50px;
+  cursor: pointer;
+}
+
+.sidebar-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.sidebar-button img {
+  width: 40px;
+}
+
+.sidebar-avatar {
+  margin-top: auto; /* Отодвигаем аватар вниз */
+  position: relative;
+  display: inline-block;
+}
+
+.sidebar-avatar img {
+  width: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.online-indicator {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 12px;
+  height: 12px;
+  background-color: green;
+  border-radius: 50%;
+  border: 2px solid #181818;
+}

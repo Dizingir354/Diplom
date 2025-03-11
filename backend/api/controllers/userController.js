@@ -104,12 +104,20 @@ const loginUser = async (req, res) => {
             { expiresIn: TOKEN_EXPIRATION }
         );
 
-        res.status(200).json({ message: 'Вы успешно вошли в систему.', token });
+        // Возвращаем токен и данные пользователя
+        res.status(200).json({
+            message: 'Вы успешно вошли в систему.',
+            token,
+            email: user.email,
+            username: user.username,
+            userId: user._id, // Возвращаем ID пользователя
+        });
     } catch (error) {
         console.error('Ошибка при входе:', error);
         res.status(500).json({ message: 'Ошибка сервера.' });
     }
 };
+
 
 module.exports = {
     registerUser,

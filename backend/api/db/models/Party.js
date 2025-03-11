@@ -1,32 +1,18 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const partySchema = new mongoose.Schema({
-    title: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    description: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    genres: {
-        type: [String],
-        required: true
-    },
-    masters: {
-        type: [String], // массив имен мастеров
-        required: true
-    },
-    players: {
-        type: [String], // массив имен игроков
-        default: [] // изначально пусто
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
+const PartySchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  image: { type: String, default: "" }, // Для загрузки изображения
+  days: [{ type: String }], // Дни недели
+  gameType: { type: String }, // Кампания, ваншот, короткий модуль
+  age: { type: String }, // 14+, 16+, 18+, 25+
+  platforms: [{ type: String }], // Roll20, Foundry и т.д.
+  system: { type: String }, // DnD 5e, Pathfinder и т.д.
+  otherTags: [{ type: String }], // Другие теги
+  requirements: { type: String }, // Требования к игрокам
+  masters: [{ type: String, required: true }], // Ведущие игры
+  players: [{ type: String }] // Список игроков, которые присоединились
 });
 
-module.exports = mongoose.model('Party', partySchema);
+module.exports = mongoose.model("Party", PartySchema);
