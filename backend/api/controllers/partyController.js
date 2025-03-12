@@ -47,11 +47,25 @@ const createParty = async (req, res) => {
 const getAllParties = async (req, res) => {
     try {
         const parties = await Party.find();
-        return res.status(200).json(parties);
+
+        const formattedParties = parties.map((party) => ({
+            ...party._doc, // Достаём данные из Mongoose-документа
+            tags: {
+                days: party.days || [],
+                gameType: party.gameType ? [party.gameType] : [],
+                age: party.age ? [party.age] : [],
+                platforms: party.platforms || [],
+                system: party.system ? [party.system] : [],
+                otherTags: party.otherTags || []
+            }
+        }));
+
+        return res.status(200).json(formattedParties);
     } catch (error) {
         return res.status(500).json({ message: 'Ошибка при получении списка партий.', error: error.message });
     }
 };
+
 
 // Обновление информации о партии
 const updateParty = async (req, res) => {

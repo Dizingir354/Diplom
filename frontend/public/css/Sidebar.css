@@ -1,40 +1,50 @@
 .sidebar {
-  width: 80px;
-  height: 100vh; /* Растягиваем меню на всю высоту экрана */
+  width: 100px;
+  height: 100vh;
   background-color: #181818;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px 0;
-  position: fixed; /* Фиксируем сбоку */
+  padding: 10px 0;
+  position: fixed;
   left: 0;
   top: 0;
 }
 
+/* Лого */
 .sidebar-logo img {
   width: 50px;
   cursor: pointer;
 }
 
+/* Кнопки */
 .sidebar-button {
   background: none;
   border: none;
   cursor: pointer;
   padding: 10px;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .sidebar-button img {
-  width: 40px;
+  width: 60px;
 }
 
+/* Аватар строго внизу */
 .sidebar-avatar {
-  margin-top: auto; /* Отодвигаем аватар вниз */
-  position: relative;
-  display: inline-block;
+  margin-top: auto;
+  padding-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .sidebar-avatar img {
-  width: 50px;
+  width: 60px;
   border-radius: 50%;
   cursor: pointer;
 }
