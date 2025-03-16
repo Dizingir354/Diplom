@@ -4,6 +4,8 @@ import Sidebar from "./Sidebar";
 
 const GameListPage = () => {
     const [games, setGames] = useState([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const gamesPerPage = 3; // Отображаем 3 игры за раз
 
     useEffect(() => {
         document.getElementById("page-style").setAttribute("href", "/css/gameList.css");
@@ -21,6 +23,23 @@ const GameListPage = () => {
         fetchGames();
     }, []);
 
+    // Переход к следующей странице
+    const nextPage = () => {
+        if ((currentPage + 1) * gamesPerPage < games.length) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+    // Переход к предыдущей странице
+    const prevPage = () => {
+        if (currentPage > 0) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    // Получаем нужные 3 игры
+    const visibleGames = games.slice(currentPage * gamesPerPage, (currentPage + 1) * gamesPerPage);
+
     return (
         <div className="game-page-container">
             <Sidebar />
@@ -33,9 +52,9 @@ const GameListPage = () => {
                     <span className="inactive-tab">ГРАВЦІВ</span>
                 </div>
 
-                {games.length > 0 ? (
+                {visibleGames.length > 0 ? (
                     <div className="game-cards">
-                        {games.map((game) => (
+                        {visibleGames.map((game) => (
                             <div key={game._id} className="game-card">
                                 <div className="game-header">
                                     <img src="/image/gameList/avatar.png" alt="Avatar" className="game-avatar" />
@@ -91,8 +110,12 @@ const GameListPage = () => {
             </div>
 
             <div className="navigation-buttons">
-                <button className="nav-arrow left-arrow">❮</button>
-                <button className="nav-arrow right-arrow">❯</button>
+                <button className="nav-arrow left-arrow" onClick={prevPage} disabled={currentPage === 0}>
+                    ❮
+                </button>
+                <button className="nav-arrow right-arrow" onClick={nextPage} disabled={(currentPage + 1) * gamesPerPage >= games.length}>
+                    ❯
+                </button>
             </div>
 
             <Link to="/games/create" className="create-game-button">
