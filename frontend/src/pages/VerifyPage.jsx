@@ -5,13 +5,13 @@ const VerifyPage = () => {
   const [code, setCode] = useState("");
 
   useEffect(() => {
-    document.getElementById("page-style").setAttribute("href", "/css/verify.css"); // Устанавливаем стили для страницы верификации
+    document.getElementById("page-style").setAttribute("href", "/css/verify.css");
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Отправка данных для верификации:", { email, code });
-  
+
     try {
       const response = await fetch("http://localhost:3000/api/verify", {
         method: "POST",
@@ -20,29 +20,27 @@ const VerifyPage = () => {
         },
         body: JSON.stringify({ email, verificationCode: code }),
       });
-  
+
       const data = await response.json();
       console.log("Ответ сервера:", data);
-  
+
       if (!response.ok) {
         throw new Error(data.message || "Ошибка верификации");
       }
-  
-      // Сохраняем токен и данные пользователя (email, username, id)
+
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify({
+        id: data.userId,
         email: data.email,
         username: data.username,
-        userId: data.userId,  // Сохраняем userId
       }));
-  
-      window.location.href = "/profile"; // Перенаправляем на страницу профиля
+
+      window.location.href = "/profile";
     } catch (error) {
       console.error("Ошибка:", error);
       alert(`Ошибка: ${error.message}`);
     }
   };
-  
 
   return (
     <div className="verify-body">

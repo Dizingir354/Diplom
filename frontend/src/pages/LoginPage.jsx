@@ -1,191 +1,94 @@
 import React, { useState, useEffect } from "react";
 
-const CreateGamePage = () => {
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
-    const [requirements, setRequirements] = useState("");
-    const [selectedTags, setSelectedTags] = useState({
-        days: [],
-        gameType: "",
-        age: "",
-        platforms: [],
-        system: "",
-        otherTags: [],
-    });
-    const [userId, setUserId] = useState(""); // ID пользователя
-    const [errorMessage, setErrorMessage] = useState(""); // Ошибки
+const LoginPage = () => {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
 
-    useEffect(() => {
-        document.getElementById("page-style").setAttribute("href", "/css/createGame.css");
+  useEffect(() => {
+    document.getElementById("page-style").setAttribute("href", "/css/login.css");
+  }, []);
 
-        // Загружаем userId из localStorage
-        const loadUserId = () => {
-            const userData = JSON.parse(localStorage.getItem("user"));
-            if (userData && userData.userId) {
-                setUserId(userData.userId); // Извлекаем userId из сохранённых данных
-            } else {
-                console.error("Ошибка: ID пользователя не найден в localStorage");
-            }
-        };
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-        loadUserId();
-    }, []);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
 
-    const handleTagClick = (category, tag) => {
-        setSelectedTags((prev) => {
-            if (category === "platforms" || category === "otherTags" || category === "days") {
-                return {
-                    ...prev,
-                    [category]: prev[category].includes(tag)
-                        ? prev[category].filter((t) => t !== tag)
-                        : [...prev[category], tag],
-                };
-            }
-            return {
-                ...prev,
-                [category]: prev[category] === tag ? "" : tag,
-            };
-        });
-    };
+    try {
+      const response = await fetch("http://localhost:3000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-    const validateForm = () => {
-        console.log("Title:", title);
-        console.log("Description:", description);
-        console.log("Requirements:", requirements);
-        console.log("Selected Tags:", selectedTags);
+      const data = await response.json();
 
-        if (!title || !description || !requirements || !selectedTags.gameType || !selectedTags.age || !selectedTags.system || selectedTags.days.length === 0) {
-            setErrorMessage("Пожалуйста, заполните все обязательные поля.");
-            return false;
-        }
-        return true;
-    };
+      if (!response.ok) {
+        throw new Error(data.message || "Ошибка входа");
+      }
 
-    const handleSubmit = async () => {
-        if (!validateForm()) return;
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify({ 
+        id: data.userId,
+        email: data.email, 
+        username: data.username 
+      }));
 
-        // Гарантируем, что userId установлен
-        if (!userId) {
-            setErrorMessage("Ошибка: не удалось получить ID пользователя.");
-            return;
-        }
+      window.location.href = "/profile";
+    } catch (error) {
+      setError(error.message);
+    }
+  };
 
-        const gameData = {
-            title,
-            description,
-            requirements,
-            days: selectedTags.days,
-            gameType: selectedTags.gameType,
-            age: selectedTags.age,
-            platforms: selectedTags.platforms,
-            system: selectedTags.system,
-            otherTags: selectedTags.otherTags,
-            masters: [userId], // Передаём ID мастера
-            players: [], // Пока пустой список игроков
-        };
+  return (
+    <div className="login-container">
+      <div className="login-bg">
+        <img src="/image/login/background.png" alt="Background" />
+      </div>
+      <div className="login-form">
+        <h1>ВХІД</h1>
+        <p>
+          Dice Roll – найповніше рішення для цифрової гри.
+        </p>
 
-        console.log("Отправляемые данные:", gameData); // Проверяем перед отправкой
+        {error && <p className="error-message">{error}</p>}
 
-        try {
-            const token = localStorage.getItem("token");
-            const response = await fetch("http://localhost:3000/api/parties", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(gameData),
-            });
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="email">Пошта</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            placeholder="Ваш email" 
+            required 
+            value={formData.email} 
+            onChange={handleChange} 
+          />
 
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.message);
-            
-            alert("Игра создана!");
-        } catch (error) {
-            alert("Ошибка: " + error.message);
-        }
-    };
+          <label htmlFor="password">Пароль</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            placeholder="Ваш пароль" 
+            required 
+            value={formData.password} 
+            onChange={handleChange} 
+          />
 
-    return (
-        <div className="create-game-container">
-            <h1>Создание Игры</h1>
-            <input type="text" placeholder="Название" value={title} onChange={(e) => setTitle(e.target.value)} />
-            <textarea placeholder="Описание игры..." value={description} onChange={(e) => setDescription(e.target.value)} />
-            <textarea placeholder="Требования к игрокам..." value={requirements} onChange={(e) => setRequirements(e.target.value)} />
-
-            {errorMessage && <div className="error-message">{errorMessage}</div>}
-
-            <div className="tags-section">
-                <h3>Дни недели</h3>
-                <div className="tags">
-                    {["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс", "За договорённостью"].map((day) => (
-                        <button key={day} className={selectedTags.days.includes(day) ? "active" : ""} onClick={() => handleTagClick("days", day)}>
-                            {day}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            <div className="tags-section">
-                <h3>Тип игры</h3>
-                <div className="tags">
-                    {["Кампания", "Ваншот", "Короткий модуль"].map((type) => (
-                        <button key={type} className={selectedTags.gameType === type ? "active" : ""} onClick={() => handleTagClick("gameType", type)}>
-                            {type}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            <div className="tags-section">
-                <h3>Возрастные ограничения</h3>
-                <div className="tags">
-                    {["14+", "16+", "18+", "25+"].map((age) => (
-                        <button key={age} className={selectedTags.age === age ? "active" : ""} onClick={() => handleTagClick("age", age)}>
-                            {age}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            <div className="tags-section">
-                <h3>Платформы</h3>
-                <div className="tags">
-                    {["Roll20", "Foundry", "D20Pro", "Discord", "Другие"].map((platform) => (
-                        <button key={platform} className={selectedTags.platforms.includes(platform) ? "active" : ""} onClick={() => handleTagClick("platforms", platform)}>
-                            {platform}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            <div className="tags-section">
-                <h3>Система</h3>
-                <div className="tags">
-                    {["DnD 5e", "Pathfinder", "World of Darkness", "Другие"].map((system) => (
-                        <button key={system} className={selectedTags.system === system ? "active" : ""} onClick={() => handleTagClick("system", system)}>
-                            {system}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            <div className="tags-section">
-                <h3>Другие теги</h3>
-                <div className="tags">
-                    {["РП", "Экшен", "Стратегия", "Пазл", "Мифология"].map((tag) => (
-                        <button key={tag} className={selectedTags.otherTags.includes(tag) ? "active" : ""} onClick={() => handleTagClick("otherTags", tag)}>
-                            {tag}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            <button className="submit-button" onClick={handleSubmit}>
-                Выложить
-            </button>
-        </div>
-    );
+          <div className="button-container">
+            <button type="submit" className="button red">ВХІД</button>
+            <a href="/register" className="button black">РЕЄСТРАЦІЯ</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 };
 
-export default CreateGamePage;
+export default LoginPage;

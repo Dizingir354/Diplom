@@ -1,0 +1,49 @@
+/* Контейнер профиля */
+.profile-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Основной контент страницы профиля */
+.profile-content {
+    flex-grow: 1;
+    padding: 40px;
+    margin-left: 250px; /* Сдвигаем контент, чтобы он не залезал под сайдбар */
+}
+
+/* Заголовок профиля */
+.profile-content h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+/* Текстовые данные пользователя */
+.profile-content p {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+/* Кнопка выхода */
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    background: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.button.red {
+    background: #dc3545;
+}
+
+.button:hover {
+    background: #0056b3;
+}
+
+.button.red:hover {
+    background: #c82333;
+}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Sidebar from "../pages/Sidebar"; // Импортируем Sidebar
+import Sidebar from "../pages/Sidebar";
 
 const CreateGamePage = () => {
     const [title, setTitle] = useState("");

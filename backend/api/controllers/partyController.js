@@ -118,8 +118,12 @@ const joinParty = async (req, res) => {
         const party = await Party.findById(id);
         if (!party) return res.status(404).json({ message: 'Партия не найдена.' });
 
-        if (party.players.includes(playerId)) {
-            return res.status(400).json({ message: 'Вы уже в этой партии.' });
+        if (party.masters.includes(playerId) || party.players.includes(playerId)) {
+            return res.status(400).json({ message: 'Вы уже участвуете в этой партии.' });
+        }
+
+        if (party.players.length >= party.maxPlayers) {
+            return res.status(400).json({ message: 'В этой партии больше нет мест.' });
         }
 
         party.players.push(playerId);

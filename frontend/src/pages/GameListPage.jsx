@@ -6,6 +6,7 @@ const GameListPage = () => {
     const [games, setGames] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
     const gamesPerPage = 3; // Отображаем 3 игры за раз
+    const [user, setUser] = useState(null);
 
     useEffect(() => {
         document.getElementById("page-style").setAttribute("href", "/css/gameList.css");
@@ -20,7 +21,15 @@ const GameListPage = () => {
             }
         };
 
+        const fetchUser = () => {
+            const storedUser = localStorage.getItem("user");
+            if (storedUser) {
+                setUser(JSON.parse(storedUser)); // Берём пользователя из localStorage
+            }
+        };
+
         fetchGames();
+        fetchUser();
     }, []);
 
     // Переход к следующей странице
@@ -34,6 +43,45 @@ const GameListPage = () => {
     const prevPage = () => {
         if (currentPage > 0) {
             setCurrentPage(currentPage - 1);
+        }
+    };
+
+    // Присоединиться к игре
+    const handleJoinGame = async (gameId, masters, players) => {
+        if (!user || !user.id) {
+            alert("Вам нужно войти в аккаунт!");
+            return;
+        }
+
+        if (masters.includes(user.id) || players.includes(user.id)) {
+            alert("Вы уже участвуете в этой игре!");
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:3000/api/parties/${gameId}/join`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ playerId: user.id })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert("Вы успешно присоединились к игре!");
+                setGames((prevGames) =>
+                    prevGames.map((game) =>
+                        game._id === gameId ? { ...game, players: [...game.players, user.id] } : game
+                    )
+                );
+            } else {
+                alert(result.message);
+            }
+        } catch (error) {
+            console.error("Ошибка при вступлении в игру:", error);
+            alert("Ошибка подключения к серверу.");
         }
     };
 
@@ -99,7 +147,12 @@ const GameListPage = () => {
                                         <p>Количество игроков: {game.players.length} из {game.maxPlayers}</p>
                                     </div>
 
-                                    <button className="join-button">ВІДГУКНУТИСЯ</button>
+                                    <button 
+                                        className="join-button" 
+                                        onClick={() => handleJoinGame(game._id, game.masters, game.players)}
+                                    >
+                                        ВІДГУКНУТИСЯ
+                                    </button>
                                 </div>
                             </div>
                         ))}

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "./Sidebar"; // Добавляем боковое меню
+import Sidebar from "./Sidebar"; // Подключаем сайдбар
 
 const ProfilePage = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState({ email: "", username: "" });
 
   useEffect(() => {
+    // Подключаем CSS для страницы профиля
     document.getElementById("page-style").setAttribute("href", "/css/profile.css");
 
     const token = localStorage.getItem("token");
