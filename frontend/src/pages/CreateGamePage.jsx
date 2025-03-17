@@ -19,11 +19,12 @@ const CreateGamePage = () => {
     useEffect(() => {
         document.getElementById("page-style")?.setAttribute("href", "/css/createGame.css");
 
-        const user = JSON.parse(localStorage.getItem("user"));
-        if (user?.userId) {
-            setUserId(user.userId);
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            setUserId(parsedUser.id); // Берём ID пользователя из localStorage
         } else {
-            setErrorMessage("Ошибка: ID пользователя не найден. Перезайдите в аккаунт.");
+            setErrorMessage("Ошибка: вы не авторизованы.");
         }
     }, []);
 
@@ -86,7 +87,7 @@ const CreateGamePage = () => {
             if (!response.ok) throw new Error(data.message);
 
             alert("Игра успешно создана!");
-            window.location.href = "/parties";
+            window.location.href = "/games";
         } catch (error) {
             setErrorMessage("Ошибка: " + error.message);
         }

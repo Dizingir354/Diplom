@@ -1,7 +1,9 @@
 import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+
   useEffect(() => {
     // Подключаем стили для сайдбара
     const link = document.createElement("link");
@@ -26,8 +28,9 @@ const Sidebar = () => {
         <img src="/image/menu/category.png" alt="Поиск игр" />
       </Link>
 
-      <button className="sidebar-button">
-        <img src="/image/menu/user-octagon.png" alt="Неизвестная кнопка" />
+      {/* КНОПКА ПЕРЕХОДА НА СТРАНИЦУ МОИХ ИГР */}
+      <button className="sidebar-button" onClick={() => navigate("/my-games")}>
+        <img src="/image/menu/user-octagon.png" alt="Мои игры" />
       </button>
 
       <button className="sidebar-button">

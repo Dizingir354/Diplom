@@ -1,0 +1,114 @@
+/* Сброс отступов и установка базовых размеров */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  color: white; /* Глобальный белый текст */
+  font-family: Arial, sans-serif;
+}
+
+/* Фон страницы – картинка, занимающая весь экран */
+body {
+  background: url('../image/UserGamesPage/background.png') no-repeat center center fixed;
+  background-size: cover;
+  position: relative;
+}
+
+/* Затемнение фона через псевдоэлемент */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Основной контейнер страницы */
+.my-games-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Контент – отступ слева равен ширине сайдбара (100px) */
+.content {
+  margin-left: 100px;
+  flex-grow: 1;
+  padding: 20px;
+  background: rgba(18, 18, 18, 0.9); /* полупрозрачный фон для контента */
+  color: white;
+}
+
+/* Заголовок страницы */
+.page-title {
+  font-size: 2rem;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  color: white;
+}
+
+/* Поле поиска */
+.search-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.search-bar input {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #444;
+  background: #222;
+  color: white;
+  border-radius: 5px;
+}
+
+.search-bar button {
+  background: red;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+/* Список игр в виде сетки */
+.game-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+/* Карточка игры */
+.game-card {
+  background: #1a1a1a;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+/* Изображение игры */
+.game-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* Информация об игре */
+.game-info h2 {
+  margin: 10px 0;
+}
+
+/* Кнопка для входа в игру */
+.join-button {
+  background: red;
+  color: white;
+  padding: 10px;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  text-transform: uppercase;
+}

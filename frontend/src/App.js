@@ -7,6 +7,7 @@ import VerifyPage from "./pages/VerifyPage";
 import ProfilePage from "./pages/ProfilePage";
 import GameListPage from "./pages/GameListPage"; 
 import CreateGamePage from "./pages/CreateGamePage"; 
+import MyGamesPage from "./pages/UserGamesPage"; // Подключаем страницу "Мои Игры"
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -27,6 +28,9 @@ const App = () => {
         {/* Страницы игр */}
         <Route path="/games" element={<GameListPage />} />
         <Route path="/games/create" element={isAuthenticated ? <CreateGamePage /> : <Navigate to="/login" />} />
+
+        {/* Новая страница "Мои Игры" */}
+        <Route path="/my-games" element={isAuthenticated ? <MyGamesPage /> : <Navigate to="/login" />} />
       </Routes>
     </Router>
   );
