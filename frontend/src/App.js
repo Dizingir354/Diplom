@@ -7,7 +7,9 @@ import VerifyPage from "./pages/VerifyPage";
 import ProfilePage from "./pages/ProfilePage";
 import GameListPage from "./pages/GameListPage"; 
 import CreateGamePage from "./pages/CreateGamePage"; 
-import MyGamesPage from "./pages/UserGamesPage"; // Подключаем страницу "Мои Игры"
+import MyGamesPage from "./pages/UserGamesPage";
+import PlayerVacanciesPage from "./pages/PlayerVacanciesPage"; // Подключаем страницу списка вакансий игроков
+import CreatePlayerVacancyPage from "./pages/CreatePlayerVacancyPage"; // Подключаем страницу создания вакансии
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -29,8 +31,12 @@ const App = () => {
         <Route path="/games" element={<GameListPage />} />
         <Route path="/games/create" element={isAuthenticated ? <CreateGamePage /> : <Navigate to="/login" />} />
 
-        {/* Новая страница "Мои Игры" */}
+        {/* Страница "Мои Игры" */}
         <Route path="/my-games" element={isAuthenticated ? <MyGamesPage /> : <Navigate to="/login" />} />
+
+        {/* Вакансии игроков */}
+        <Route path="/player-vacancies" element={<PlayerVacanciesPage />} />
+        <Route path="/player-vacancies/create" element={isAuthenticated ? <CreatePlayerVacancyPage /> : <Navigate to="/login" />} />
       </Routes>
     </Router>
   );

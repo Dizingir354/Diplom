@@ -1,16 +1,18 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const playerVacancySchema = new mongoose.Schema({
-  playerName: { type: String, required: true, minlength: 2, maxlength: 50 },
-  description: { type: String, required: true, minlength: 10, maxlength: 500 },
+  description: { type: String, required: true },
   gameSystem: { type: String, required: true },
-  preferredGenres: [{ type: String }], // Список предпочтительных жанров
-  tags: {
-    type: Map,
-    of: String, // Значения могут быть 'Дискомфортно', 'Без подробиць', 'Комфортно'
-    default: {},
-  },
-  createdAt: { type: Date, default: Date.now },
+  platform: { type: String, required: true }, // Добавлено
+  age: { type: String, required: true }, // Добавлено
+  gameType: { type: String, required: true }, // Добавлено
+  days: { type: [String], required: true }, // Добавлено (массив дней)
+  creator: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  uncomfortableTopics: {
+    discomfort: { type: [String], default: [] },
+    noDetails: { type: [String], default: [] },
+    comfortable: { type: [String], default: [] }
+  }
 });
 
-module.exports = mongoose.model('PlayerVacancy', playerVacancySchema);
+module.exports = mongoose.model("PlayerVacancy", playerVacancySchema);

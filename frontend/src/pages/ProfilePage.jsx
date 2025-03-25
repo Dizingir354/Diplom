@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 
 const ProfilePage = () => {
+  const navigate = useNavigate();
   const [user, setUser] = useState({ email: "", username: "" });
   const [myParties, setMyParties] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
@@ -50,11 +52,23 @@ const ProfilePage = () => {
     fetchParties();
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("email");
+    localStorage.removeItem("username");
+    navigate("/");
+  };
+  
+
   return (
     <div className="profile-page">
       <Sidebar />
 
       <div className="profile-content">
+        {/* Кнопка выхода */}
+        <button className="logout-button" onClick={handleLogout}>Вийти</button>
+
         <div className="profile-header">
           <img className="banner" src="/image/profile/banner.png" alt="Profile banner" />
           <div className="profile-info">
@@ -89,7 +103,6 @@ const ProfilePage = () => {
                     </p>
                   )}
 
-                  {/* Исправлено: Проверяем и корректно выводим требования */}
                   {party.requirements && (
                     <p className="party-requirements">
                       <strong>Вимоги:</strong> {Array.isArray(party.requirements) 
