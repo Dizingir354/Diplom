@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import Sidebar from "../pages/Sidebar";
 
 const PlayerVacanciesPage = () => {
     const [vacancies, setVacancies] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
-    const vacanciesPerPage = 3;
+    const [activeTab, setActiveTab] = useState("ГРАВЦІ"); // Состояние активной вкладки
+    const vacanciesPerPage = 8;
 
     useEffect(() => {
-        document.getElementById("page-style").setAttribute("href", "/css/gameList.css");
+        document.getElementById("page-style").setAttribute("href", "/css/playerVacancies.css");
 
         const fetchVacancies = async () => {
             try {
@@ -37,46 +39,60 @@ const PlayerVacanciesPage = () => {
     const visibleVacancies = vacancies.slice(currentPage * vacanciesPerPage, (currentPage + 1) * vacanciesPerPage);
 
     return (
-        <div className="game-page-container">
-            <div className="game-list-content">
-                <h1 className="page-title">Вакансії гравців</h1>
+        <div className="player-vacancies-page">
+            <Sidebar />
+            <div className="content">
+                <h1 className="page-title">ОГОЛОШЕННЯ</h1>
 
-                {visibleVacancies.length > 0 ? (
-                    <div className="game-cards">
-                        {visibleVacancies.map((vacancy) => (
-                            <div key={vacancy._id} className="game-card">
-                                <div className="game-header">
-                                    <img src="/image/gameList/avatar.png" alt="Avatar" className="game-avatar" />
-                                    <div className="host-name">
-                                        <h2>{vacancy.playerName}</h2>
-                                        <span className="online-indicator"></span>
+                {/* Переключение вкладок */}
+                <div className="tabs">
+                    <span className={`tab ${activeTab === "МАЙСТРИ" ? "active" : "inactive"}`}
+                          onClick={() => setActiveTab("МАЙСТРИ")}>
+                        МАЙСТРИ
+                    </span>
+                    <span className={`tab ${activeTab === "ГРАВЦІ" ? "active" : "inactive"}`}
+                          onClick={() => setActiveTab("ГРАВЦІ")}>
+                        ГРАВЦІВ
+                    </span>
+                </div>
+
+                {activeTab === "ГРАВЦІ" && (
+                    visibleVacancies.length > 0 ? (
+                        <div className="vacancies-container">
+                            {visibleVacancies.map((vacancy) => (
+                                <div key={vacancy._id} className="vacancy-card">
+                                    <div className="vacancy-header">
+                                        <img src="/image/gameList/avatar.png" alt="Avatar" className="vacancy-avatar" />
+                                        <div className="vacancy-name">
+                                            <h2>{vacancy.playerName}</h2>
+                                            <span className="online-indicator"></span>
+                                        </div>
+                                    </div>
+
+                                    <div className="vacancy-info">
+                                        <p className="vacancy-description">{vacancy.description}</p>
+
+                                        <div className="vacancy-tags">
+                                            {vacancy.tags?.length > 0 ? (
+                                                vacancy.tags.map((tag) => (
+                                                    <span key={tag} className="tag">{tag}</span>
+                                                ))
+                                            ) : (
+                                                <p className="no-tags">Теги не вказані</p>
+                                            )}
+                                        </div>
+
+                                        <button className="view-button">Переглянути</button>
                                     </div>
                                 </div>
-
-                                <div className="game-info">
-                                    <p>{vacancy.description}</p>
-
-                                    <div className="game-tags">
-                                        {vacancy.tags && vacancy.tags.length > 0 ? (
-                                            vacancy.tags.map((tag) => (
-                                                <span key={tag} className="game-tag">
-                                                    {tag}
-                                                </span>
-                                            ))
-                                        ) : (
-                                            <p className="no-tags">Теги не вказані</p>
-                                        )}
-                                    </div>
-
-                                    <button className="join-button">ЗВ'ЯЗАТИСЯ</button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <p className="no-vacancies">Вакансій поки немає.</p>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="no-vacancies">Вакансій поки немає.</p>
+                    )
                 )}
 
+                {/* Кнопки навигации */}
                 <div className="navigation-buttons">
                     <button className="nav-arrow left-arrow" onClick={prevPage} disabled={currentPage === 0}>
                         ❮
@@ -86,9 +102,9 @@ const PlayerVacanciesPage = () => {
                     </button>
                 </div>
 
-                {/* Кнопка создания вакансии игрока */}
-                <Link to="/player-vacancies/create" className="create-game-button">
-                    <img src="/image/gameList/createGame.png" alt="Создать вакансию игрока" />
+                {/* Кнопка создания вакансии (плюсик) */}
+                <Link to="/player-vacancies/create" className="create-vacancy-button">
+                    <img src="/mnt/data/image.png" alt="Создать вакансию" />
                 </Link>
             </div>
         </div>

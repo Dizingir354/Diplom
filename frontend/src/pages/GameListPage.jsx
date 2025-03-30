@@ -1,58 +1,65 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import PlayerVacanciesPage from "./PlayerVacanciesPage";
 
 const GameListPage = () => {
     const [games, setGames] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
     const gamesPerPage = 3;
     const [user, setUser] = useState(null);
-    const [activeTab, setActiveTab] = useState("МАСТЕРОВ");
+
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    // Определяем текущую вкладку по URL
+    const isPlayersTab = location.pathname === "/player-vacancies";
 
     useEffect(() => {
         document.getElementById("page-style").setAttribute("href", "/css/gameList.css");
+    }, []);
 
-        const fetchGames = async () => {
-            try {
-                const response = await fetch("http://localhost:3000/api/parties");
-                const data = await response.json();
-                setGames(data);
-            } catch (error) {
-                console.error("Ошибка загрузки игр:", error);
-            }
-        };
+    const fetchGames = useCallback(async () => {
+        try {
+            const response = await fetch("http://localhost:3000/api/parties");
+            if (!response.ok) throw new Error("Ошибка загрузки игр");
+            const data = await response.json();
+            setGames(data);
+        } catch (error) {
+            console.error("Ошибка загрузки игр:", error);
+        }
+    }, []);
 
-        const fetchUser = () => {
-            const storedUser = localStorage.getItem("user");
-            if (storedUser) {
-                setUser(JSON.parse(storedUser));
-            }
-        };
+    const fetchUser = useCallback(() => {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
+    }, []);
 
+    useEffect(() => {
         fetchGames();
         fetchUser();
-    }, []);
+    }, [fetchGames, fetchUser]);
 
     const nextPage = () => {
         if ((currentPage + 1) * gamesPerPage < games.length) {
-            setCurrentPage(currentPage + 1);
+            setCurrentPage((prev) => prev + 1);
         }
     };
 
     const prevPage = () => {
         if (currentPage > 0) {
-            setCurrentPage(currentPage - 1);
+            setCurrentPage((prev) => prev - 1);
         }
     };
 
     const handleJoinGame = async (gameId, masters, players) => {
-        if (!user || !user.id) {
+        if (!user?.username) {
             alert("Вам нужно войти в аккаунт!");
             return;
         }
 
-        if (masters.includes(user.id) || players.includes(user.id)) {
+        if (masters.includes(user.username) || players.includes(user.username)) {
             alert("Вы уже участвуете в этой игре!");
             return;
         }
@@ -61,7 +68,7 @@ const GameListPage = () => {
             const response = await fetch(`http://localhost:3000/api/parties/${gameId}/join`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ playerId: user.id })
+                body: JSON.stringify({ playerId: user.username })
             });
 
             const result = await response.json();
@@ -70,7 +77,7 @@ const GameListPage = () => {
                 alert("Вы успешно присоединились к игре!");
                 setGames((prevGames) =>
                     prevGames.map((game) =>
-                        game._id === gameId ? { ...game, players: [...game.players, user.id] } : game
+                        game._id === gameId ? { ...game, players: [...game.players, user.username] } : game
                     )
                 );
             } else {
@@ -93,20 +100,20 @@ const GameListPage = () => {
 
                 <div className="tab-container">
                     <span
-                        className={activeTab === "МАСТЕРОВ" ? "active-tab" : "inactive-tab"}
-                        onClick={() => setActiveTab("МАСТЕРОВ")}
+                        className={!isPlayersTab ? "active-tab" : "inactive-tab"}
+                        onClick={() => navigate("/games")}
                     >
                         МАСТЕРОВ
                     </span>
                     <span
-                        className={activeTab === "ГРАВЦІВ" ? "active-tab" : "inactive-tab"}
-                        onClick={() => setActiveTab("ГРАВЦІВ")}
+                        className={isPlayersTab ? "active-tab" : "inactive-tab"}
+                        onClick={() => navigate("/player-vacancies")}
                     >
                         ГРАВЦІВ
                     </span>
                 </div>
 
-                {activeTab === "МАСТЕРОВ" ? (
+                {!isPlayersTab ? (
                     <>
                         {visibleGames.length > 0 ? (
                             <div className="game-cards">
@@ -130,9 +137,9 @@ const GameListPage = () => {
                                             </div>
 
                                             <div className="game-tags">
-                                                {game.tags && Object.keys(game.tags).length > 0 ? (
-                                                    Object.keys(game.tags).map((category) =>
-                                                        game.tags[category].map((tag) => (
+                                                {game.tags ? (
+                                                    Object.entries(game.tags).flatMap(([category, tags]) =>
+                                                        tags.map((tag) => (
                                                             <span key={tag} className="game-tag">
                                                                 {tag}
                                                             </span>
