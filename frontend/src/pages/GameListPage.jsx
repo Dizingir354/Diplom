@@ -1,18 +1,16 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Sidebar from "./Sidebar";
 
 const GameListPage = () => {
     const [games, setGames] = useState([]);
+    const [vacancies, setVacancies] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
-    const gamesPerPage = 3;
+    const [activeTab, setActiveTab] = useState("МАСТЕРА");
     const [user, setUser] = useState(null);
 
-    const navigate = useNavigate();
-    const location = useLocation();
-
-    // Определяем текущую вкладку по URL
-    const isPlayersTab = location.pathname === "/player-vacancies";
+    const gamesPerPage = 3;
+    const vacanciesPerPage = 8;
 
     useEffect(() => {
         document.getElementById("page-style").setAttribute("href", "/css/gameList.css");
@@ -29,6 +27,16 @@ const GameListPage = () => {
         }
     }, []);
 
+    const fetchVacancies = useCallback(async () => {
+        try {
+            const response = await fetch("http://localhost:3000/api/player-vacancies");
+            const data = await response.json();
+            setVacancies(data);
+        } catch (error) {
+            console.error("Ошибка загрузки вакансий игроков:", error);
+        }
+    }, []);
+
     const fetchUser = useCallback(() => {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -38,11 +46,14 @@ const GameListPage = () => {
 
     useEffect(() => {
         fetchGames();
+        fetchVacancies();
         fetchUser();
-    }, [fetchGames, fetchUser]);
+    }, [fetchGames, fetchVacancies, fetchUser]);
 
     const nextPage = () => {
-        if ((currentPage + 1) * gamesPerPage < games.length) {
+        if (activeTab === "МАСТЕРА" && (currentPage + 1) * gamesPerPage < games.length) {
+            setCurrentPage((prev) => prev + 1);
+        } else if (activeTab === "ГРАВЦІ" && (currentPage + 1) * vacanciesPerPage < vacancies.length) {
             setCurrentPage((prev) => prev + 1);
         }
     };
@@ -90,6 +101,7 @@ const GameListPage = () => {
     };
 
     const visibleGames = games.slice(currentPage * gamesPerPage, (currentPage + 1) * gamesPerPage);
+    const visibleVacancies = vacancies.slice(currentPage * vacanciesPerPage, (currentPage + 1) * vacanciesPerPage);
 
     return (
         <div className="game-page-container">
@@ -100,20 +112,26 @@ const GameListPage = () => {
 
                 <div className="tab-container">
                     <span
-                        className={!isPlayersTab ? "active-tab" : "inactive-tab"}
-                        onClick={() => navigate("/games")}
+                        className={activeTab === "МАСТЕРА" ? "active-tab" : "inactive-tab"}
+                        onClick={() => {
+                            setActiveTab("МАСТЕРА");
+                            setCurrentPage(0);
+                        }}
                     >
                         МАСТЕРОВ
                     </span>
                     <span
-                        className={isPlayersTab ? "active-tab" : "inactive-tab"}
-                        onClick={() => navigate("/player-vacancies")}
+                        className={activeTab === "ГРАВЦІ" ? "active-tab" : "inactive-tab"}
+                        onClick={() => {
+                            setActiveTab("ГРАВЦІ");
+                            setCurrentPage(0);
+                        }}
                     >
                         ГРАВЦІВ
                     </span>
                 </div>
 
-                {!isPlayersTab ? (
+                {activeTab === "МАСТЕРА" ? (
                     <>
                         {visibleGames.length > 0 ? (
                             <div className="game-cards">
@@ -132,36 +150,16 @@ const GameListPage = () => {
                                         </div>
 
                                         <div className="game-info">
-                                            <div className="game-time">
-                                                <p><b>Час:</b> {game.time}</p>
-                                            </div>
-
+                                            <p><b>Час:</b> {game.time}</p>
                                             <div className="game-tags">
-                                                {game.tags ? (
-                                                    Object.entries(game.tags).flatMap(([category, tags]) =>
-                                                        tags.map((tag) => (
-                                                            <span key={tag} className="game-tag">
-                                                                {tag}
-                                                            </span>
-                                                        ))
-                                                    )
+                                                {game.tags?.length ? (
+                                                    game.tags.map((tag) => (
+                                                        <span key={tag} className="game-tag">{tag}</span>
+                                                    ))
                                                 ) : (
-                                                    <p className="no-tags">Теги не заданы</p>
+                                                    <p className="no-tags">Теги не вказані</p>
                                                 )}
                                             </div>
-
-                                            <div className="game-requirements">
-                                                <p><b>Вимоги:</b> {game.requirements || "Не указаны"}</p>
-                                            </div>
-
-                                            <div className="game-description">
-                                                <p>{game.description}</p>
-                                            </div>
-
-                                            <div className="game-players">
-                                                <p>Количество игроков: {game.players.length} из {game.maxPlayers}</p>
-                                            </div>
-
                                             <button 
                                                 className="join-button" 
                                                 onClick={() => handleJoinGame(game._id, game.masters, game.players)}
@@ -175,23 +173,53 @@ const GameListPage = () => {
                         ) : (
                             <p className="no-games">Ігр поки немає.</p>
                         )}
-
-                        <div className="navigation-buttons">
-                            <button className="nav-arrow left-arrow" onClick={prevPage} disabled={currentPage === 0}>
-                                ❮
-                            </button>
-                            <button className="nav-arrow right-arrow" onClick={nextPage} disabled={(currentPage + 1) * gamesPerPage >= games.length}>
-                                ❯
-                            </button>
-                        </div>
-
-                        <Link to="/games/create" className="create-game-button">
-                            <img src="/image/gameList/createGame.png" alt="Создать игру" />
-                        </Link>
                     </>
                 ) : (
-                    <PlayerVacanciesPage />
+                    <>
+                        {visibleVacancies.length > 0 ? (
+                            <div className="vacancies-container">
+                                {visibleVacancies.map((vacancy) => (
+                                    <div key={vacancy._id} className="vacancy-card">
+                                        <div className="vacancy-header">
+                                            <img src="/image/gameList/avatar.png" alt="Avatar" className="vacancy-avatar" />
+                                            <div className="vacancy-name">
+                                                <h2>{vacancy.playerName}</h2>
+                                                <span className="online-indicator"></span>
+                                            </div>
+                                        </div>
+                                        <div className="vacancy-info">
+                                            <p className="vacancy-description">{vacancy.description}</p>
+                                            <div className="vacancy-tags">
+                                                {vacancy.tags?.length ? (
+                                                    vacancy.tags.map((tag) => (
+                                                        <span key={tag} className="tag">{tag}</span>
+                                                    ))
+                                                ) : (
+                                                    <p className="no-tags">Теги не вказані</p>
+                                                )}
+                                            </div>
+                                            <button className="view-button">Переглянути</button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="no-vacancies">Вакансій поки немає.</p>
+                        )}
+                    </>
                 )}
+
+                <div className="create-game-container">
+                    <Link to={activeTab === "МАСТЕРА" ? "/games/create" : "/player-vacancies/create"} className="create-game-button">
+                        <img src="/image/gameList/createGame.png" alt="Добавить" />
+                    </Link>
+                </div>
+
+
+                <div className="navigation-buttons">
+                    <button className="nav-arrow left-arrow" onClick={prevPage} disabled={currentPage === 0}>❮</button>
+                    <button className="nav-arrow right-arrow" onClick={nextPage} disabled={(currentPage + 1) * (activeTab === "МАСТЕРА" ? gamesPerPage : vacanciesPerPage) >= (activeTab === "МАСТЕРА" ? games.length : vacancies.length)}>❯</button>
+                </div>
             </div>
         </div>
     );

@@ -17,34 +17,26 @@ body::before {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.904);
+  background: rgba(0, 0, 0, 0.85);
   z-index: -1;
 }
 
-/* Основной контейнер */
 .game-page-container {
   display: flex;
-  position: relative;
   height: 100vh;
-  z-index: 1;
+  width: 100%;
 }
 
-/* Сайдбар (он фиксирован и затемнение на него не должно залезать) */
 .sidebar {
   width: 250px;
-  background: rgba(0, 0, 0, 0.9);
-  padding: 20px;
-  position: relative;
-  z-index: 2;
+  flex-shrink: 0;
 }
 
-/* Контентный блок */
 .game-list-content {
   flex-grow: 1;
   padding: 20px;
   overflow: auto;
-  background: rgba(0, 0, 0, 0.8);
-  min-width: calc(100% - 250px);
+  background: rgba(0, 0, 0, 0.75);
   border-radius: 10px;
   margin: 10px;
 }
@@ -53,7 +45,7 @@ body::before {
 .page-title {
   font-size: 2rem;
   text-transform: uppercase;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   color: white;
   text-align: center;
 }
@@ -85,7 +77,8 @@ body::before {
 }
 
 /* Сетка карточек */
-.game-cards {
+.game-cards,
+.vacancies-container {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
@@ -93,7 +86,8 @@ body::before {
 }
 
 /* Карточка игры */
-.game-card {
+.game-card,
+.vacancy-card {
   background: rgba(20, 20, 20, 0.9);
   border-radius: 10px;
   padding: 15px;
@@ -105,27 +99,32 @@ body::before {
   transition: transform 0.2s ease-in-out;
 }
 
-.game-card:hover {
+.game-card:hover,
+.vacancy-card:hover {
   transform: scale(1.02);
 }
 
 /* Хедер карточки */
-.game-header {
+.game-header,
+.vacancy-header {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-/* Аватар мастера */
-.game-avatar {
+/* Аватар мастера / игрока */
+.game-avatar,
+.vacancy-avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
 }
 
-/* Имя мастера */
-.host-name {
+/* Имя мастера / игрока */
+.host-name,
+.vacancy-name h2 {
   font-size: 1.2rem;
+  margin: 0;
 }
 
 /* Индикатор онлайн */
@@ -137,20 +136,16 @@ body::before {
   box-shadow: 0 0 5px rgba(0, 255, 0, 0.8);
 }
 
-/* Картинка игры */
-.game-image img {
-  width: 100%;
-  border-radius: 5px;
-}
-
 /* Теги */
-.game-tags {
+.game-tags,
+.vacancy-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
 }
 
-.game-tag {
+.game-tag,
+.tag {
   background: #444;
   padding: 5px 10px;
   border-radius: 5px;
@@ -158,13 +153,15 @@ body::before {
   transition: background 0.3s;
 }
 
-.game-tag:hover {
+.game-tag:hover,
+.tag:hover {
   background: red;
   cursor: pointer;
 }
 
-/* Кнопка */
-.join-button {
+/* Кнопки */
+.join-button,
+.view-button {
   background: red;
   border: none;
   color: white;
@@ -175,18 +172,17 @@ body::before {
   transition: background 0.3s ease-in-out;
 }
 
-.join-button:hover {
+.join-button:hover,
+.view-button:hover {
   background: darkred;
 }
 
 /* Навигационные кнопки */
 .navigation-buttons {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
+  justify-content: center;
   gap: 10px;
+  margin-top: 20px;
 }
 
 .nav-arrow {
@@ -209,30 +205,28 @@ body::before {
 
 /* КНОПКА СОЗДАНИЯ ИГРЫ */
 .create-game-button {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: none; /* Убираем фон */
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 100; /* Выше всех элементов */
+  background: none;
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
-  padding: 0;
 }
 
-/* Плюс в кнопке */
 .create-game-button img {
   width: 40px;
   height: 40px;
-  display: block;
 }
 
-/* Эффект при наведении */
 .create-game-button:hover img {
   filter: brightness(1.2);
   transform: scale(1.1);
   transition: transform 0.2s, filter 0.2s;
 }
+
 
 /* Адаптивность */
 @media (max-width: 768px) {
@@ -241,22 +235,19 @@ body::before {
     padding: 15px;
   }
 
-  .game-cards {
+  .game-cards,
+  .vacancies-container {
     flex-direction: column;
     align-items: center;
   }
 
-  .game-card {
+  .game-card,
+  .vacancy-card {
     width: 90%;
-  }
-
-  .navigation-buttons {
-    bottom: 10px;
   }
 
   .create-game-button {
     top: 10px;
     right: 10px;
-    padding: 8px 12px;
   }
 }
