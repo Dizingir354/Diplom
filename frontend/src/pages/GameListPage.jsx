@@ -40,7 +40,15 @@ const GameListPage = () => {
     const fetchUser = useCallback(() => {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
-            setUser(JSON.parse(storedUser));
+            try {
+                const parsedUser = JSON.parse(storedUser);
+                setUser({
+                    ...parsedUser,
+                    _id: parsedUser.id // Исправляем: используем id как _id
+                });
+            } catch (e) {
+                console.error("Ошибка парсинга пользователя:", e);
+            }
         }
     }, []);
 
@@ -65,12 +73,12 @@ const GameListPage = () => {
     };
 
     const handleJoinGame = async (gameId, masters, players) => {
-        if (!user?.username) {
+        if (!user?._id) {
             alert("Вам нужно войти в аккаунт!");
             return;
         }
 
-        if (masters.includes(user.username) || players.includes(user.username)) {
+        if (masters.includes(user._id) || players.includes(user._id)) {
             alert("Вы уже участвуете в этой игре!");
             return;
         }
@@ -78,21 +86,27 @@ const GameListPage = () => {
         try {
             const response = await fetch(`http://localhost:3000/api/parties/${gameId}/join`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ playerId: user.username })
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("token")}` // Добавляем токен авторизации
+                },
+                body: JSON.stringify({ playerId: user._id })
             });
 
             const result = await response.json();
 
             if (response.ok) {
                 alert("Вы успешно присоединились к игре!");
-                setGames((prevGames) =>
-                    prevGames.map((game) =>
-                        game._id === gameId ? { ...game, players: [...game.players, user.username] } : game
+                // Обновляем список игр
+                setGames(prevGames => 
+                    prevGames.map(game => 
+                        game._id === gameId 
+                            ? { ...game, players: [...game.players, user._id] } 
+                            : game
                     )
                 );
             } else {
-                alert(result.message);
+                alert(result.message || "Ошибка при присоединении");
             }
         } catch (error) {
             console.error("Ошибка при вступлении в игру:", error);
@@ -214,7 +228,6 @@ const GameListPage = () => {
                         <img src="/image/gameList/createGame.png" alt="Добавить" />
                     </Link>
                 </div>
-
 
                 <div className="navigation-buttons">
                     <button className="nav-arrow left-arrow" onClick={prevPage} disabled={currentPage === 0}>❮</button>

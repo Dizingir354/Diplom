@@ -1,33 +1,213 @@
+/* Общие стили */
+body {
+    background-color: #121212;
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
 .create-vacancy-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     position: relative;
     padding: 20px;
 }
 
+/* Заголовок по центру */
+.page-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Контейнер для основных блоков */
+.content-wrapper {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    justify-content: space-between;
+    gap: 30px; /* Увеличил отступ между колонками */
+    align-items: flex-start; /* Выравнивание по верху */
+}
+
+/* Левая колонка (Теги и Опис) */
+.left-column {
+    width: 55%; /* Немного увеличил ширину */
+    max-width: 650px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Фон */
 .background-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: url("/img/background.jpg") no-repeat center center;
+    background: url('../image/createGame/background.png') no-repeat center center;
     background-size: cover;
-    filter: brightness(40%);
+    filter: brightness(30%);
     z-index: -1;
 }
 
-.tags-section, .description-section, .uncomfortable-topics {
-    margin-bottom: 20px;
+/* Теги */
+.tags-section {
+    background: #181818;
+    padding: 15px;
+    border-radius: 8px;
 }
 
-.tags-group, .topic-category {
+.tags-section h3 {
+    margin-top: 0;
+}
+
+.tags-group {
     margin-top: 10px;
 }
 
-button {
-    margin: 5px;
+.tags-group h4 {
+    margin: 10px 0;
+    font-size: 14px;
+    color: #ccc;
 }
 
-textarea {
+.tags-group button {
+    background: none;
+    border: 1px solid #444;
+    color: white;
+    padding: 5px 10px;
+    margin: 3px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.tags-group button.selected {
+    border-color: red;
+}
+
+/* Описание */
+.description-section {
+    background: #181818;
+    padding: 15px;
+    border-radius: 8px;
     width: 100%;
-    height: 100px;
+    box-sizing: border-box; /* Чтобы padding не влиял на ширину */
+}
+
+.description-section h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.description-section textarea {
+    width: 100%;
+    height: 120px; /* Уменьшил высоту */
+    min-height: 120px; /* Минимальная высота */
+    max-height: 300px; /* Максимальная высота */
+    background: #222;
+    color: white;
+    border: 1px solid #444;
+    padding: 12px;
+    resize: vertical; /* Разрешено изменять только по вертикали */
+    border-radius: 5px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+/* Правая часть (Неприємні теми) */
+.uncomfortable-topics {
+    width: 40%;
+    max-width: 500px;
+    background: #181818;
+    padding: 15px;
+    border-radius: 8px;
+    position: sticky;
+    top: 20px; /* Чтобы блок оставался на месте при прокрутке */
+}
+
+.topic-category {
+    margin-bottom: 15px;
+}
+
+.topic-category h4 {
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #ccc;
+}
+
+.topic-options {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.topic-button {
+    background: #222;
+    border: 1px solid #444;
+    color: white;
+    padding: 5px 10px;
+    margin: 3px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.topic-button.selected {
+    border-color: red;
+}
+
+/* Кнопка отправки */
+.submit-button {
+    width: 100%;
+    max-width: 1200px;
+    padding: 10px;
+    background: red;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+.submit-button:hover {
+    background: darkred;
+}
+
+/* Уровни комфорта */
+.comfort-levels {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.comfort-levels div {
+    display: flex;
+    align-items: center;
+}
+
+.comfort-levels div span {
+    margin-left: 5px;
+}
+
+.comfort-levels div.red {
+    color: red;
+}
+
+.comfort-levels div.yellow {
+    color: yellow;
+}
+
+.comfort-levels div.grey {
+    color: grey;
+}
+
+.error-message {
+    color: red;
+    margin-bottom: 15px;
 }

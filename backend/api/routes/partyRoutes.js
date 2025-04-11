@@ -18,5 +18,6 @@ router.put('/:id', validateObjectId, partyController.updateParty);
 router.delete('/:id', validateObjectId, partyController.deleteParty);
 router.post('/:id/join', validateObjectId, partyController.joinParty);
 router.delete('/:id/leave', validateObjectId, partyController.leaveParty);
+router.get('/:id', validateObjectId, partyController.getPartyById);
 
 module.exports = router;

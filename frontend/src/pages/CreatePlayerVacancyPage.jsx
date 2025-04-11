@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Sidebar from "./Sidebar";
 
 const CreatePlayerVacancyPage = () => {
     const navigate = useNavigate();
@@ -11,7 +12,6 @@ const CreatePlayerVacancyPage = () => {
     const [days, setDays] = useState([]);
     const [comfortLevels] = useState(["Дискомфортно", "Без подробиць", "Комфортно"]);
     const [comfortState, setComfortState] = useState({});
-
     const [userId, setUserId] = useState(null);
     const [errorMessage, setErrorMessage] = useState("");
 
@@ -22,7 +22,7 @@ const CreatePlayerVacancyPage = () => {
         if (storedUser) {
             try {
                 const parsedUser = JSON.parse(storedUser);
-                setUserId(parsedUser.id || parsedUser._id); // Поддержка разных форматов ID
+                setUserId(parsedUser.id || parsedUser._id);
             } catch (error) {
                 console.error("Ошибка парсинга данных пользователя:", error);
             }
@@ -52,14 +52,8 @@ const CreatePlayerVacancyPage = () => {
         event.preventDefault();
 
         const token = localStorage.getItem("token");
-
-        if (!token) {
-            console.error("Ошибка: Токен отсутствует! Пользователь не авторизован.");
-            return;
-        }
-
-        if (!userId) {
-            console.error("Ошибка: отсутствует ID пользователя.");
+        if (!token || !userId) {
+            console.error("Ошибка: отсутствует токен или ID пользователя.");
             return;
         }
 
@@ -68,7 +62,7 @@ const CreatePlayerVacancyPage = () => {
         const comfortable = Object.keys(comfortState).filter(topic => comfortState[topic] === "Комфортно");
 
         const vacancyData = {
-            userId, 
+            userId,
             description,
             gameSystem,
             platform,
@@ -82,10 +76,7 @@ const CreatePlayerVacancyPage = () => {
             },
         };
 
-
         try {
-            console.log("Отправляемые данные:", JSON.stringify(vacancyData, null, 2));
-
             const response = await fetch("http://localhost:3000/api/player-vacancies", {
                 method: "POST",
                 headers: {
@@ -96,7 +87,6 @@ const CreatePlayerVacancyPage = () => {
             });
 
             if (response.ok) {
-                console.log("Вакансия создана");
                 navigate("/profile");
             } else {
                 const errorData = await response.json();
@@ -110,88 +100,102 @@ const CreatePlayerVacancyPage = () => {
     return (
         <div className="create-vacancy-container">
             <div className="background-overlay"></div>
+            <Sidebar />
             <h2>Створення вакансії гравця</h2>
             {errorMessage && <p className="error-message">{errorMessage}</p>}
+
             <form onSubmit={handleSubmit} className="vacancy-form">
-                <div className="tags-section">
-                    <h3>Теги</h3>
-                    <div className="tags-group">
-                        <h4>Система</h4>
-                        {availableGameSystems.map((sys) => (
-                            <button key={sys} className={gameSystem === sys ? "selected" : ""} onClick={(e) => {
-                                e.preventDefault();
-                                setGameSystem(sys);
-                            }}>{sys}</button>
-                        ))}
-                    </div>
+                <div className="content-wrapper">
+                    <div className="left-column">
+                        {/* Блок тегов */}
+                        <div className="tags-section">
+                            <h3>Теги</h3>
+                            <div className="tags-group">
+                                <h4>Система</h4>
+                                {availableGameSystems.map((sys) => (
+                                    <button key={sys} className={gameSystem === sys ? "selected" : ""} onClick={(e) => {
+                                        e.preventDefault();
+                                        setGameSystem(sys);
+                                    }}>{sys}</button>
+                                ))}
+                            </div>
 
-                    <div className="tags-group">
-                        <h4>Платформа</h4>
-                        {availablePlatforms.map((plat) => (
-                            <button key={plat} className={platform === plat ? "selected" : ""} onClick={(e) => {
-                                e.preventDefault();
-                                setPlatform(plat);
-                            }}>{plat}</button>
-                        ))}
-                    </div>
+                            <div className="tags-group">
+                                <h4>Платформа</h4>
+                                {availablePlatforms.map((plat) => (
+                                    <button key={plat} className={platform === plat ? "selected" : ""} onClick={(e) => {
+                                        e.preventDefault();
+                                        setPlatform(plat);
+                                    }}>{plat}</button>
+                                ))}
+                            </div>
 
-                    <div className="tags-group">
-                        <h4>Вік</h4>
-                        {availableAges.map((ageOpt) => (
-                            <button key={ageOpt} className={age === ageOpt ? "selected" : ""} onClick={(e) => {
-                                e.preventDefault();
-                                setAge(ageOpt);
-                            }}>{ageOpt}</button>
-                        ))}
-                    </div>
+                            <div className="tags-group">
+                                <h4>Вік</h4>
+                                {availableAges.map((ageOpt) => (
+                                    <button key={ageOpt} className={age === ageOpt ? "selected" : ""} onClick={(e) => {
+                                        e.preventDefault();
+                                        setAge(ageOpt);
+                                    }}>{ageOpt}</button>
+                                ))}
+                            </div>
 
-                    <div className="tags-group">
-                        <h4>Тип гри</h4>
-                        {availableGameTypes.map((type) => (
-                            <button key={type} className={gameType === type ? "selected" : ""} onClick={(e) => {
-                                e.preventDefault();
-                                setGameType(type);
-                            }}>{type}</button>
-                        ))}
-                    </div>
+                            <div className="tags-group">
+                                <h4>Тип гри</h4>
+                                {availableGameTypes.map((type) => (
+                                    <button key={type} className={gameType === type ? "selected" : ""} onClick={(e) => {
+                                        e.preventDefault();
+                                        setGameType(type);
+                                    }}>{type}</button>
+                                ))}
+                            </div>
 
-                    <div className="tags-group">
-                        <h4>Дні</h4>
-                        {availableDays.map((day) => (
-                            <button key={day} className={days.includes(day) ? "selected" : ""} onClick={(e) => {
-                                e.preventDefault();
-                                setDays(days.includes(day) ? days.filter((d) => d !== day) : [...days, day]);
-                            }}>{day}</button>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="description-section">
-                    <h3>Опис</h3>
-                    <textarea value={description} onChange={(e) => setDescription(e.target.value)} required />
-                </div>
-
-                <div className="uncomfortable-topics">
-                    <h3>Неприємні теми</h3>
-                    {Object.entries(availableUncomfortableTopics).map(([category, topics]) => (
-                        <div key={category} className="topic-category">
-                            <h4>{category}</h4>
-                            <div className="topic-options">
-                                {topics.map((topic) => (
-                                    <button
-                                        key={topic}
-                                        className={`topic-button ${comfortState[topic] === "Дискомфортно" ? "selected" : ""}`}
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            toggleComfortLevel(topic);
-                                        }}
-                                    >
-                                        {topic} ({comfortState[topic] || "Комфортно"})
-                                    </button>
+                            <div className="tags-group">
+                                <h4>Дні</h4>
+                                {availableDays.map((day) => (
+                                    <button key={day} className={days.includes(day) ? "selected" : ""} onClick={(e) => {
+                                        e.preventDefault();
+                                        setDays(days.includes(day) ? days.filter((d) => d !== day) : [...days, day]);
+                                    }}>{day}</button>
                                 ))}
                             </div>
                         </div>
-                    ))}
+
+                        {/* Блок опису (теперь под тегами) */}
+                        <div className="description-section">
+                            <h3>Опис</h3>
+                            <textarea
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                placeholder="Опишіть вашу вакансію, вкажіть додаткові побажання чи особливості..."
+                                className="description-textarea"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Блок Неприємні теми (остаётся справа) */}
+                    <div className="uncomfortable-topics">
+                        <h3>Неприємні теми</h3>
+                        {Object.entries(availableUncomfortableTopics).map(([category, topics]) => (
+                            <div key={category} className="topic-category">
+                                <h4>{category}</h4>
+                                <div className="topic-options">
+                                    {topics.map((topic) => (
+                                        <button
+                                            key={topic}
+                                            className={`topic-button ${comfortState[topic] === "Дискомфортно" ? "selected" : ""}`}
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                toggleComfortLevel(topic);
+                                            }}
+                                        >
+                                            {topic} ({comfortState[topic] || "Комфортно"})
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
                 <button type="submit" className="submit-button">Викласти</button>

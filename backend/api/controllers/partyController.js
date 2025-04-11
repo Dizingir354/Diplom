@@ -71,15 +71,15 @@ const getAllParties = async (req, res) => {
 const updateParty = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, description, genres, masters, players } = req.body;
+        const { title, description, days, gameType, age, platforms, system, otherTags, requirements, masters, players } = req.body;
 
-        if (!title || !description || !genres?.length || !masters?.length) {
+        if (!title || !description || !days?.length || !gameType || !age || !platforms?.length || !system || !masters?.length) {
             return res.status(400).json({ message: 'Заполните все обязательные поля.' });
         }
 
         const updatedParty = await Party.findByIdAndUpdate(
             id,
-            { title, description, genres, masters, players },
+            { title, description, days, gameType, age, platforms, system, otherTags, requirements, masters, players },
             { new: true, runValidators: true }
         );
 
@@ -153,11 +153,49 @@ const leaveParty = async (req, res) => {
     }
 };
 
+const getPartyById = async (req, res) => {
+    try {
+        const party = await Party.findById(req.params.id)
+            .populate({
+                path: 'masters',
+                select: 'username online -_id' // Исключаем аватар, если его нет
+            })
+            .populate({
+                path: 'players', 
+                select: 'username online -_id'
+            });
+
+        if (!party) {
+            return res.status(404).json({ message: 'Партия не найдена.' });
+        }
+
+        // Форматируем данные для гарантированного отображения
+        const formattedParty = {
+            ...party._doc,
+            masters: party.masters.map(master => ({
+                username: master.username || 'Мастер',
+                online: master.online || false
+            })),
+            players: party.players.map(player => ({
+                username: player.username || 'Игрок',
+                online: player.online || false
+            }))
+        };
+
+        res.status(200).json(formattedParty);
+    } catch (error) {
+        console.error('Ошибка:', error);
+        res.status(500).json({ message: 'Ошибка сервера' });
+    }
+};
+
+
 module.exports = {
     createParty,
     getAllParties,
     updateParty,
     deleteParty,
     joinParty,
-    leaveParty
+    leaveParty,
+    getPartyById
 };

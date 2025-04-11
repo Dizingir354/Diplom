@@ -1,44 +1,58 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 
-const MyGamesPage = () => {
+const UserGamesPage = () => {
   const [games, setGames] = useState([]);
   const [search, setSearch] = useState("");
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Подключаем стили для страницы
     document.getElementById("page-style").setAttribute("href", "/css/myGames.css");
 
-    const fetchGames = async () => {
+    const fetchData = async () => {
       try {
+        setLoading(true);
+        
+        // Загружаем пользователя
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
+        }
+
+        // Загружаем игры
         const response = await fetch("http://localhost:3000/api/parties");
+        if (!response.ok) throw new Error("Ошибка загрузки игр");
+        
         const data = await response.json();
-        setGames(data);
+        setGames(Array.isArray(data) ? data : []);
+
       } catch (error) {
-        console.error("Ошибка загрузки игр:", error);
+        console.error("Ошибка:", error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
       }
     };
 
-    const fetchUser = () => {
-      const storedUser = localStorage.getItem("user");
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
-      }
-    };
-
-    fetchGames();
-    fetchUser();
+    fetchData();
   }, []);
 
-  if (!user) {
-    return <p>Загрузка...</p>;
-  }
+  const filteredGames = games.filter(game => {
+    // Безопасная проверка массивов masters и players
+    const masters = Array.isArray(game?.masters) ? game.masters : [];
+    const players = Array.isArray(game?.players) ? game.players : [];
+    
+    return (user?.id && (masters.includes(user.id) || players.includes(user.id))) &&
+           game.title?.toLowerCase().includes(search.toLowerCase());
+  });
 
-  // Фильтруем игры по мастерам/игрокам и по названию (поле title)
-  const filteredGames = games
-    .filter(game => game.masters.includes(user.id) || game.players.includes(user.id))
-    .filter(game => game.title.toLowerCase().includes(search.toLowerCase()));
+  if (loading) return <div className="loading">Загрузка...</div>;
+  if (error) return <div className="error">Ошибка: {error}</div>;
+  if (!user) return <div className="no-user">Пользователь не загружен</div>;
 
   return (
     <div className="my-games-container">
@@ -47,7 +61,6 @@ const MyGamesPage = () => {
       <div className="content">
         <h1 className="page-title">МОЇ ІГРИ</h1>
 
-        {/* Поле поиска */}
         <div className="search-bar">
           <input
             type="text"
@@ -58,7 +71,6 @@ const MyGamesPage = () => {
           <button>ПОШУК</button>
         </div>
 
-        {/* Список игр */}
         <div className="game-list">
           {filteredGames.length > 0 ? (
             filteredGames.map((game) => (
@@ -70,14 +82,21 @@ const MyGamesPage = () => {
                 />
                 <div className="game-info">
                   <h2>{game.title}</h2>
-                  <p><b>Дата наступної гри:</b> {game.date}</p>
-                  <p>{game.description}</p>
-                  <button className="join-button">ЗАЙТИ В КІМНАТУ</button>
+                  <p><b>Дата наступної гри:</b> {game.date || "Не вказано"}</p>
+                  <p>{game.description || "Опис відсутній"}</p>
+                  <button
+                    className="join-button"
+                    onClick={() => navigate(`/party/${game._id}`)}
+                  >
+                    ЗАЙТИ В КІМНАТУ
+                  </button>
                 </div>
               </div>
             ))
           ) : (
-            <p className="no-games">У вас поки немає ігор.</p>
+            <p className="no-games">
+              {search ? "Нічого не знайдено" : "У вас поки немає ігор."}
+            </p>
           )}
         </div>
       </div>
@@ -85,4 +104,4 @@ const MyGamesPage = () => {
   );
 };
 
-export default MyGamesPage;
+export default UserGamesPage;
