@@ -27,7 +27,7 @@ const createVacancy = async (req, res) => {
             age,
             gameType,
             days,
-            creator: userId, // теперь берём userId и сохраняем как creator
+            creator: userId, // сохраняем ID создателя
             uncomfortableTopics
         });
 
@@ -53,11 +53,28 @@ const getAllVacancies = async (req, res) => {
 // Получить вакансию по ID
 const getVacancyById = async (req, res) => {
     try {
-        const vacancy = await PlayerVacancy.findById(req.params.id);
+        const vacancy = await PlayerVacancy.findById(req.params.id)
+            .populate({
+                path: 'creator',
+                select: 'username online -_id' // получаем username создателя
+            });
+            
         if (!vacancy) {
             return res.status(404).json({ error: 'Вакансия не найдена' });
         }
-        res.status(200).json(vacancy);
+        
+        // Инициализация полей, если они отсутствуют
+        const result = vacancy.toObject();
+        if (!result.days) result.days = [];
+        if (!result.uncomfortableTopics) {
+            result.uncomfortableTopics = {
+                discomfort: [],
+                noDetails: [],
+                comfortable: []
+            };
+        }
+        
+        res.status(200).json(result);
     } catch (error) {
         console.error("Ошибка при получении вакансии:", error);
         res.status(500).json({ error: 'Ошибка при получении вакансии', details: error.message });
@@ -126,6 +143,9 @@ const leaveVacancy = async (req, res) => {
         res.status(500).json({ message: 'Ошибка при выходе.', error: error.message });
     }
 };
+
+
+
 
 module.exports = {
     createVacancy,

@@ -8,6 +8,7 @@ const GameListPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [activeTab, setActiveTab] = useState("МАСТЕРА");
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState({ games: true, vacancies: true });
 
     const gamesPerPage = 3;
     const vacanciesPerPage = 8;
@@ -18,22 +19,29 @@ const GameListPage = () => {
 
     const fetchGames = useCallback(async () => {
         try {
+            setLoading(prev => ({ ...prev, games: true }));
             const response = await fetch("http://localhost:3000/api/parties");
             if (!response.ok) throw new Error("Ошибка загрузки игр");
             const data = await response.json();
             setGames(data);
         } catch (error) {
             console.error("Ошибка загрузки игр:", error);
+        } finally {
+            setLoading(prev => ({ ...prev, games: false }));
         }
     }, []);
 
     const fetchVacancies = useCallback(async () => {
         try {
+            setLoading(prev => ({ ...prev, vacancies: true }));
             const response = await fetch("http://localhost:3000/api/player-vacancies");
+            if (!response.ok) throw new Error("Ошибка загрузки вакансий");
             const data = await response.json();
             setVacancies(data);
         } catch (error) {
             console.error("Ошибка загрузки вакансий игроков:", error);
+        } finally {
+            setLoading(prev => ({ ...prev, vacancies: false }));
         }
     }, []);
 
@@ -44,7 +52,7 @@ const GameListPage = () => {
                 const parsedUser = JSON.parse(storedUser);
                 setUser({
                     ...parsedUser,
-                    _id: parsedUser.id // Исправляем: используем id как _id
+                    _id: parsedUser.id
                 });
             } catch (e) {
                 console.error("Ошибка парсинга пользователя:", e);
@@ -60,15 +68,15 @@ const GameListPage = () => {
 
     const nextPage = () => {
         if (activeTab === "МАСТЕРА" && (currentPage + 1) * gamesPerPage < games.length) {
-            setCurrentPage((prev) => prev + 1);
+            setCurrentPage(prev => prev + 1);
         } else if (activeTab === "ГРАВЦІ" && (currentPage + 1) * vacanciesPerPage < vacancies.length) {
-            setCurrentPage((prev) => prev + 1);
+            setCurrentPage(prev => prev + 1);
         }
     };
 
     const prevPage = () => {
         if (currentPage > 0) {
-            setCurrentPage((prev) => prev - 1);
+            setCurrentPage(prev => prev - 1);
         }
     };
 
@@ -88,7 +96,7 @@ const GameListPage = () => {
                 method: "POST",
                 headers: { 
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem("token")}` // Добавляем токен авторизации
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
                 },
                 body: JSON.stringify({ playerId: user._id })
             });
@@ -97,7 +105,6 @@ const GameListPage = () => {
 
             if (response.ok) {
                 alert("Вы успешно присоединились к игре!");
-                // Обновляем список игр
                 setGames(prevGames => 
                     prevGames.map(game => 
                         game._id === gameId 
@@ -116,6 +123,48 @@ const GameListPage = () => {
 
     const visibleGames = games.slice(currentPage * gamesPerPage, (currentPage + 1) * gamesPerPage);
     const visibleVacancies = vacancies.slice(currentPage * vacanciesPerPage, (currentPage + 1) * vacanciesPerPage);
+
+    const renderGameTags = (game) => {
+        if (!game.tags) return <p className="no-tags">Теги не вказані</p>;
+        
+        return (
+            <>
+                {game.tags.days?.map((tag) => (
+                    <span key={`days-${tag}`} className="game-tag">{tag}</span>
+                ))}
+                {game.tags.gameType?.map((tag) => (
+                    <span key={`type-${tag}`} className="game-tag">{tag}</span>
+                ))}
+                {game.tags.age?.map((tag) => (
+                    <span key={`age-${tag}`} className="game-tag">{tag}</span>
+                ))}
+                {game.tags.platforms?.map((tag) => (
+                    <span key={`platform-${tag}`} className="game-tag">{tag}</span>
+                ))}
+                {game.tags.system?.map((tag) => (
+                    <span key={`system-${tag}`} className="game-tag">{tag}</span>
+                ))}
+                {game.tags.otherTags?.map((tag) => (
+                    <span key={`other-${tag}`} className="game-tag">{tag}</span>
+                ))}
+            </>
+        );
+    };
+
+    const renderVacancyTags = (vacancy) => {
+        const tags = [];
+        if (vacancy.gameSystem) tags.push(vacancy.gameSystem);
+        if (vacancy.platform) tags.push(vacancy.platform);
+        if (vacancy.age) tags.push(vacancy.age);
+        if (vacancy.gameType) tags.push(vacancy.gameType);
+        if (vacancy.days) tags.push(...vacancy.days);
+
+        if (tags.length === 0) return <p className="no-tags">Теги не вказані</p>;
+
+        return tags.map((tag, index) => (
+            <span key={`tag-${index}`} className="tag">{tag}</span>
+        ));
+    };
 
     return (
         <div className="game-page-container">
@@ -145,7 +194,9 @@ const GameListPage = () => {
                     </span>
                 </div>
 
-                {activeTab === "МАСТЕРА" ? (
+                {loading.games && loading.vacancies ? (
+                    <div className="loading">Завантаження...</div>
+                ) : activeTab === "МАСТЕРА" ? (
                     <>
                         {visibleGames.length > 0 ? (
                             <div className="game-cards">
@@ -154,25 +205,26 @@ const GameListPage = () => {
                                         <div className="game-header">
                                             <img src="/image/gameList/avatar.png" alt="Avatar" className="game-avatar" />
                                             <div className="game-host">
-                                                <h2 className="host-name">{game.host}</h2>
-                                                <span className="online-indicator"></span>
+                                                <h2 className="host-name">
+                                                    {game.masters?.[0]?.username || "Майстер"}
+                                                </h2>
+                                                {game.masters?.[0]?.online && (
+                                                    <span className="online-indicator"></span>
+                                                )}
                                             </div>
                                         </div>
 
                                         <div className="game-image">
-                                            <img src="/image/gameList/game-placeholder.png" alt="Game Image" />
+                                            <img src="/image/gameList/game-placeholder.png" alt="Game" />
                                         </div>
 
                                         <div className="game-info">
-                                            <p><b>Час:</b> {game.time}</p>
+                                            <p><b>Назва:</b> {game.title}</p>
+                                            {game.days?.length > 0 && (
+                                                <p><b>Дні:</b> {game.days.join(', ')}</p>
+                                            )}
                                             <div className="game-tags">
-                                                {game.tags?.length ? (
-                                                    game.tags.map((tag) => (
-                                                        <span key={tag} className="game-tag">{tag}</span>
-                                                    ))
-                                                ) : (
-                                                    <p className="no-tags">Теги не вказані</p>
-                                                )}
+                                                {renderGameTags(game)}
                                             </div>
                                             <button 
                                                 className="join-button" 
@@ -197,22 +249,23 @@ const GameListPage = () => {
                                         <div className="vacancy-header">
                                             <img src="/image/gameList/avatar.png" alt="Avatar" className="vacancy-avatar" />
                                             <div className="vacancy-name">
-                                                <h2>{vacancy.playerName}</h2>
-                                                <span className="online-indicator"></span>
+                                                <h2>{vacancy.creator?.username || "Гравець"}</h2>
+                                                {vacancy.creator?.online && (
+                                                    <span className="online-indicator"></span>
+                                                )}
                                             </div>
                                         </div>
                                         <div className="vacancy-info">
                                             <p className="vacancy-description">{vacancy.description}</p>
+                                            {vacancy.days?.length > 0 && (
+                                                <p><b>Дні:</b> {vacancy.days.join(', ')}</p>
+                                            )}
                                             <div className="vacancy-tags">
-                                                {vacancy.tags?.length ? (
-                                                    vacancy.tags.map((tag) => (
-                                                        <span key={tag} className="tag">{tag}</span>
-                                                    ))
-                                                ) : (
-                                                    <p className="no-tags">Теги не вказані</p>
-                                                )}
+                                                {renderVacancyTags(vacancy)}
                                             </div>
-                                            <button className="view-button">Переглянути</button>
+                                            <Link to={`/player-vacancy/${vacancy._id}`} className="view-button">
+                                                Переглянути
+                                            </Link>
                                         </div>
                                     </div>
                                 ))}
@@ -230,8 +283,23 @@ const GameListPage = () => {
                 </div>
 
                 <div className="navigation-buttons">
-                    <button className="nav-arrow left-arrow" onClick={prevPage} disabled={currentPage === 0}>❮</button>
-                    <button className="nav-arrow right-arrow" onClick={nextPage} disabled={(currentPage + 1) * (activeTab === "МАСТЕРА" ? gamesPerPage : vacanciesPerPage) >= (activeTab === "МАСТЕРА" ? games.length : vacancies.length)}>❯</button>
+                    <button 
+                        className="nav-arrow left-arrow" 
+                        onClick={prevPage} 
+                        disabled={currentPage === 0}
+                    >
+                        ❮
+                    </button>
+                    <button 
+                        className="nav-arrow right-arrow" 
+                        onClick={nextPage} 
+                        disabled={
+                            (currentPage + 1) * (activeTab === "МАСТЕРА" ? gamesPerPage : vacanciesPerPage) >= 
+                            (activeTab === "МАСТЕРА" ? games.length : vacancies.length)
+                        }
+                    >
+                        ❯
+                    </button>
                 </div>
             </div>
         </div>

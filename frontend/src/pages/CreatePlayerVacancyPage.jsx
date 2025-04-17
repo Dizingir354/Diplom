@@ -42,6 +42,17 @@ const CreatePlayerVacancyPage = () => {
         "Проблеми соціальні": ["Дискримінація", "Канібалізм", "Рабство", "Тероризм", "Геноцид", "Катування"]
     };
 
+    // Инициализация состояния для всех тем как "Комфортно"
+    useEffect(() => {
+        const initialComfortState = {};
+        Object.values(availableUncomfortableTopics).forEach(topics => {
+            topics.forEach(topic => {
+                initialComfortState[topic] = "Комфортно";
+            });
+        });
+        setComfortState(initialComfortState);
+    }, []);
+
     const toggleComfortLevel = (topic) => {
         const currentIndex = comfortLevels.indexOf(comfortState[topic] || "Комфортно");
         const newIndex = (currentIndex + 1) % comfortLevels.length;
@@ -57,9 +68,20 @@ const CreatePlayerVacancyPage = () => {
             return;
         }
 
-        const discomfort = Object.keys(comfortState).filter(topic => comfortState[topic] === "Дискомфортно");
-        const noDetails = Object.keys(comfortState).filter(topic => comfortState[topic] === "Без подробиць");
-        const comfortable = Object.keys(comfortState).filter(topic => comfortState[topic] === "Комфортно");
+        // Собираем все темы, даже те, что остались "Комфортно"
+        const discomfort = [];
+        const noDetails = [];
+        const comfortable = [];
+
+        Object.entries(comfortState).forEach(([topic, level]) => {
+            if (level === "Дискомфортно") {
+                discomfort.push(topic);
+            } else if (level === "Без подробиць") {
+                noDetails.push(topic);
+            } else {
+                comfortable.push(topic);
+            }
+        });
 
         const vacancyData = {
             userId,
@@ -70,9 +92,9 @@ const CreatePlayerVacancyPage = () => {
             gameType,
             days,
             uncomfortableTopics: {
-                discomfort: discomfort.length > 0 ? discomfort : null,
-                noDetails: noDetails.length > 0 ? noDetails : null,
-                comfortable: comfortable.length > 0 ? comfortable : null,
+                discomfort: discomfort.length > 0 ? discomfort : [],
+                noDetails: noDetails.length > 0 ? noDetails : [],
+                comfortable: comfortable.length > 0 ? comfortable : [],
             },
         };
 
@@ -161,7 +183,7 @@ const CreatePlayerVacancyPage = () => {
                             </div>
                         </div>
 
-                        {/* Блок опису (теперь под тегами) */}
+                        {/* Блок опису */}
                         <div className="description-section">
                             <h3>Опис</h3>
                             <textarea
@@ -173,7 +195,7 @@ const CreatePlayerVacancyPage = () => {
                         </div>
                     </div>
 
-                    {/* Блок Неприємні теми (остаётся справа) */}
+                    {/* Блок Неприємні теми */}
                     <div className="uncomfortable-topics">
                         <h3>Неприємні теми</h3>
                         {Object.entries(availableUncomfortableTopics).map(([category, topics]) => (
@@ -183,7 +205,8 @@ const CreatePlayerVacancyPage = () => {
                                     {topics.map((topic) => (
                                         <button
                                             key={topic}
-                                            className={`topic-button ${comfortState[topic] === "Дискомфортно" ? "selected" : ""}`}
+                                            className={`topic-button ${comfortState[topic] === "Дискомфортно" ? "discomfort" : 
+                                              comfortState[topic] === "Без подробиць" ? "no-details" : "comfortable"}`}
                                             onClick={(e) => {
                                                 e.preventDefault();
                                                 toggleComfortLevel(topic);

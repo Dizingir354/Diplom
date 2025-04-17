@@ -11,6 +11,7 @@ import MyGamesPage from "./pages/UserGamesPage";
 import PlayerVacanciesPage from "./pages/PlayerVacanciesPage"; // Подключаем страницу списка вакансий игроков
 import CreatePlayerVacancyPage from "./pages/CreatePlayerVacancyPage"; // Подключаем страницу создания вакансии
 import ViewPartyPage from "./pages/ViewPartyPage";
+import ViewPlayerVacancyPage from "./pages/ViewPlayerVacancyPage";
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -40,6 +41,7 @@ const App = () => {
         <Route path="/player-vacancies/create" element={isAuthenticated ? <CreatePlayerVacancyPage /> : <Navigate to="/login" />} />
 
         <Route path="/party/:id" element={isAuthenticated ? <ViewPartyPage /> : <Navigate to="/login" />} />
+        <Route path="/player-vacancy/:id" element={<ViewPlayerVacancyPage />} />
       </Routes>
     </Router>
   );

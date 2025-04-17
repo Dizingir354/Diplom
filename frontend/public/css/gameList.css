@@ -94,9 +94,10 @@ body::before {
   width: 320px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px; /* Увеличили отступ между элементами */
   color: white;
   transition: transform 0.2s ease-in-out;
+  position: relative; /* Для позиционирования кнопки */
 }
 
 .game-card:hover,
@@ -136,27 +137,52 @@ body::before {
   box-shadow: 0 0 5px rgba(0, 255, 0, 0.8);
 }
 
+/* Изображение игры */
+.game-image img {
+  width: 100%;
+  border-radius: 5px;
+  max-height: 150px;
+  object-fit: cover;
+}
+
+/* Блок с информацией */
+.game-info,
+.vacancy-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 /* Теги */
 .game-tags,
 .vacancy-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
+  margin-bottom: 10px; /* Добавили отступ снизу */
+  min-height: 30px; /* Минимальная высота для контейнера тегов */
 }
 
 .game-tag,
 .tag {
-  background: #444;
+  background: #111;
   padding: 5px 10px;
   border-radius: 5px;
   font-size: 12px;
   transition: background 0.3s;
+  white-space: nowrap; /* Запрещаем перенос текста */
 }
 
 .game-tag:hover,
 .tag:hover {
   background: red;
   cursor: pointer;
+}
+
+.no-tags {
+  color: #777;
+  font-size: 0.9rem;
+  margin: 0;
 }
 
 /* Кнопки */
@@ -170,6 +196,8 @@ body::before {
   cursor: pointer;
   font-weight: bold;
   transition: background 0.3s ease-in-out;
+  width: 100%; /* Занимает всю ширину */
+  margin-top: auto; /* Прижимаем кнопку к низу */
 }
 
 .join-button:hover,
@@ -204,35 +232,47 @@ body::before {
 }
 
 /* КНОПКА СОЗДАНИЯ ИГРЫ */
-.create-game-button {
+.create-game-container {
   position: fixed;
-  top: 10px;
-  right: 10px;
-  z-index: 100; /* Выше всех элементов */
+  bottom: 20px;
+  right: 20px;
+  z-index: 100;
+}
+
+.create-game-button {
   background: none;
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
+  padding: 0;
 }
 
 .create-game-button img {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
+  transition: transform 0.2s, filter 0.2s;
 }
 
 .create-game-button:hover img {
   filter: brightness(1.2);
   transform: scale(1.1);
-  transition: transform 0.2s, filter 0.2s;
 }
-
 
 /* Адаптивность */
 @media (max-width: 768px) {
+  .game-page-container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+
   .game-list-content {
     min-width: 100%;
     padding: 15px;
+    margin: 0;
   }
 
   .game-cards,
@@ -243,11 +283,23 @@ body::before {
 
   .game-card,
   .vacancy-card {
-    width: 90%;
+    width: 100%;
   }
 
-  .create-game-button {
-    top: 10px;
+  .create-game-container {
+    bottom: 10px;
     right: 10px;
   }
+}
+
+/* Дополнительные стили для дней проведения */
+.game-info p b,
+.vacancy-info p b {
+  color: #ccc;
+  margin-right: 5px;
+}
+
+.game-info p,
+.vacancy-info p {
+  margin: 5px 0;
 }

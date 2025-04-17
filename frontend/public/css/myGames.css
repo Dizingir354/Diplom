@@ -4,18 +4,18 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
-  color: white; /* Глобальный белый текст */
+  color: white;
   font-family: Arial, sans-serif;
 }
 
-/* Фон страницы – картинка, занимающая весь экран */
+/* Фон страницы */
 body {
   background: url('../image/UserGamesPage/background.png') no-repeat center center fixed;
   background-size: cover;
   position: relative;
 }
 
-/* Затемнение фона через псевдоэлемент */
+/* Затемнение фона */
 body::after {
   content: "";
   position: fixed;
@@ -28,22 +28,22 @@ body::after {
   z-index: -1;
 }
 
-/* Основной контейнер страницы */
+/* Основной контейнер */
 .my-games-container {
   display: flex;
   min-height: 100vh;
 }
 
-/* Контент – отступ слева равен ширине сайдбара (100px) */
+/* Контент */
 .content {
   margin-left: 100px;
   flex-grow: 1;
   padding: 20px;
-  background: rgba(18, 18, 18, 0.9); /* полупрозрачный фон для контента */
+  background: rgba(18, 18, 18, 0.9);
   color: white;
 }
 
-/* Заголовок страницы */
+/* Заголовок */
 .page-title {
   font-size: 2rem;
   text-transform: uppercase;
@@ -75,7 +75,7 @@ body::after {
   cursor: pointer;
 }
 
-/* Список игр в виде сетки */
+/* Сетка карточек игр */
 .game-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -89,7 +89,6 @@ body::after {
   border-radius: 10px;
 }
 
-/* Изображение игры */
 .game-image {
   width: 100%;
   height: 150px;
@@ -97,12 +96,10 @@ body::after {
   border-radius: 10px;
 }
 
-/* Информация об игре */
 .game-info h2 {
   margin: 10px 0;
 }
 
-/* Кнопка для входа в игру */
 .join-button {
   background: red;
   color: white;
@@ -111,4 +108,63 @@ body::after {
   width: 100%;
   cursor: pointer;
   text-transform: uppercase;
+}
+
+/* Подзаголовок */
+.page-subtitle {
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  margin: 40px 0 20px;
+  color: white;
+}
+
+/* Сетка карточек вакансий */
+.vacancy-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: flex-start;
+}
+
+/* Карточка вакансии */
+.vacancy-card {
+  background: #1a1a1a;
+  padding: 15px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 400px; /* Ограничение по ширине */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease;
+}
+
+.vacancy-card:hover {
+  transform: scale(1.02); /* Лёгкий ховер-эффект */
+}
+
+.vacancy-card h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+.vacancy-card p {
+  margin: 5px 0;
+  font-size: 0.95rem;
+}
+
+
+/* Сообщения о пустом списке */
+.no-games {
+  margin-top: 20px;
+  font-style: italic;
+  color: #ccc;
+}
+
+/* Состояния загрузки и ошибок */
+.loading, .error, .no-user {
+  margin: 50px;
+  font-size: 1.2rem;
+  color: white;
 }

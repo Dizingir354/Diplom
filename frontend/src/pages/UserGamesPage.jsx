@@ -4,6 +4,7 @@ import Sidebar from "./Sidebar";
 
 const UserGamesPage = () => {
   const [games, setGames] = useState([]);
+  const [vacancies, setVacancies] = useState([]);
   const [search, setSearch] = useState("");
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -16,22 +17,35 @@ const UserGamesPage = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
-        // Загружаем пользователя
+
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
-          setUser(JSON.parse(storedUser));
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+
+          const [partiesRes, vacanciesRes] = await Promise.all([
+            fetch("http://localhost:3000/api/parties"),
+            fetch("http://localhost:3000/api/player-vacancies"),
+          ]);
+
+          if (!partiesRes.ok || !vacanciesRes.ok) {
+            throw new Error("Помилка при завантаженні даних");
+          }
+
+          const [partiesData, vacanciesData] = await Promise.all([
+            partiesRes.json(),
+            vacanciesRes.json(),
+          ]);
+
+          setGames(Array.isArray(partiesData) ? partiesData : []);
+          setVacancies(
+            Array.isArray(vacanciesData)
+              ? vacanciesData.filter((v) => v.creator === parsedUser.id)
+              : []
+          );
         }
-
-        // Загружаем игры
-        const response = await fetch("http://localhost:3000/api/parties");
-        if (!response.ok) throw new Error("Ошибка загрузки игр");
-        
-        const data = await response.json();
-        setGames(Array.isArray(data) ? data : []);
-
       } catch (error) {
-        console.error("Ошибка:", error);
+        console.error("Помилка:", error);
         setError(error.message);
       } finally {
         setLoading(false);
@@ -41,13 +55,15 @@ const UserGamesPage = () => {
     fetchData();
   }, []);
 
-  const filteredGames = games.filter(game => {
-    // Безопасная проверка массивов masters и players
+  const filteredGames = games.filter((game) => {
     const masters = Array.isArray(game?.masters) ? game.masters : [];
     const players = Array.isArray(game?.players) ? game.players : [];
-    
-    return (user?.id && (masters.includes(user.id) || players.includes(user.id))) &&
-           game.title?.toLowerCase().includes(search.toLowerCase());
+
+    return (
+      user?.id &&
+      (masters.includes(user.id) || players.includes(user.id)) &&
+      game.title?.toLowerCase().includes(search.toLowerCase())
+    );
   });
 
   if (loading) return <div className="loading">Загрузка...</div>;
@@ -97,6 +113,23 @@ const UserGamesPage = () => {
             <p className="no-games">
               {search ? "Нічого не знайдено" : "У вас поки немає ігор."}
             </p>
+          )}
+        </div>
+
+        <h2 className="page-subtitle">МОЇ ОГОЛОШЕННЯ ЯК ГРАВЕЦЬ</h2>
+
+        <div className="vacancy-list">
+          {vacancies.length > 0 ? (
+            vacancies.map((vacancy) => (
+              <div key={vacancy._id} className="vacancy-card">
+                <h3>{vacancy.title || "Оголошення"}</h3>
+                <p><b>Система:</b> {vacancy.gameSystem || "Не вказано"}</p>
+                <p><b>Дні:</b> {vacancy.days?.join(", ") || "Не вказано"}</p>
+                <p>{vacancy.description || "Опис відсутній"}</p>
+              </div>
+            ))
+          ) : (
+            <p className="no-games">У вас немає активних оголошень.</p>
           )}
         </div>
       </div>
