@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Sidebar from '../pages/Sidebar';
+import PartyChat from '../pages/PartyChat';
 import { useParams } from 'react-router-dom';
 
 const ViewPartyPage = () => {
@@ -14,6 +15,8 @@ const ViewPartyPage = () => {
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [username, setUsername] = useState('');
+  const [messages, setMessages] = useState([]); // 💬
 
   useEffect(() => {
     document.getElementById("page-style").setAttribute("href", "/css/viewParty.css");
@@ -23,18 +26,26 @@ const ViewPartyPage = () => {
       setNotes(savedNotes);
     }
 
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        setUsername(parsedUser.username || '');
+      } catch (err) {
+        console.error("Ошибка при разборе user из localStorage:", err);
+      }
+    }
+
     const fetchParty = async () => {
       try {
         setLoading(true);
         const response = await fetch(`http://localhost:3000/api/parties/${id}`);
-        
         if (!response.ok) {
           throw new Error('Не удалось загрузить данные партии');
         }
 
         const data = await response.json();
-        
-        // Гарантируем наличие всех необходимых полей
+
         setParty({
           title: data.title || 'Без названия',
           description: data.description || 'Описание отсутствует',
@@ -42,7 +53,6 @@ const ViewPartyPage = () => {
           masters: Array.isArray(data.masters) ? data.masters : [],
           players: Array.isArray(data.players) ? data.players : []
         });
-
       } catch (err) {
         console.error("Ошибка загрузки:", err);
         setError(err.message);
@@ -51,7 +61,19 @@ const ViewPartyPage = () => {
       }
     };
 
+    const fetchMessages = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/api/parties/${id}/messages`);
+        if (!response.ok) throw new Error('Не удалось загрузить сообщения');
+        const data = await response.json();
+        setMessages(data);
+      } catch (err) {
+        console.error("Ошибка при загрузке истории сообщений:", err);
+      }
+    };
+
     fetchParty();
+    fetchMessages();
   }, [id]);
 
   const handleNotesChange = (e) => {
@@ -61,12 +83,12 @@ const ViewPartyPage = () => {
   };
 
   const formatDays = (days) => {
-    if (!days || days.length === 0) return 'Дни не указаны';
+    if (!days || days.length === 0) return 'Дні не вказані';
     return days.join(', ');
   };
 
-  if (loading) return <div className="loading">Загрузка партии...</div>;
-  if (error) return <div className="error">Ошибка: {error}</div>;
+  if (loading) return <div className="loading">Завантаження партії...</div>;
+  if (error) return <div className="error">Помилка: {error}</div>;
 
   return (
     <div className="view-party-wrapper">
@@ -83,12 +105,12 @@ const ViewPartyPage = () => {
               {party.masters.length > 0 ? (
                 party.masters.map((master, index) => (
                   <div key={`master-${master._id || index}`} className="user-block">
-                    <span className="user-name">{master.username || `Мастер ${index + 1}`}</span>
+                    <span className="user-name">{master.username || `Майстер ${index + 1}`}</span>
                     <span className={`status ${master.online ? 'online' : 'offline'}`} />
                   </div>
                 ))
               ) : (
-                <div className="no-users">Нет мастеров</div>
+                <div className="no-users">Немає майстрів</div>
               )}
             </div>
 
@@ -97,19 +119,19 @@ const ViewPartyPage = () => {
               {party.players.length > 0 ? (
                 party.players.map((player, index) => (
                   <div key={`player-${player._id || index}`} className="user-block">
-                    <span className="user-name">{player.username || `Игрок ${index + 1}`}</span>
+                    <span className="user-name">{player.username || `Гравець ${index + 1}`}</span>
                     <span className={`status ${player.online ? 'online' : 'offline'}`} />
                   </div>
                 ))
               ) : (
-                <div className="no-users">Пока нет игроков</div>
+                <div className="no-users">Поки немає гравців</div>
               )}
             </div>
           </div>
 
           <div className="center-column">
-            <div className="block chat-placeholder">
-              <p>Блок чату зараз в розробці.</p>
+            <div className="block">
+              <PartyChat partyId={id} username={username} messages={messages} />
             </div>
           </div>
 
@@ -132,7 +154,7 @@ const ViewPartyPage = () => {
                     <li key={`note-${index}`}>{line}</li>
                   ))
                 ) : (
-                  <li>Нотаток пока нет</li>
+                  <li>Нотаток поки немає</li>
                 )}
               </ul>
               <textarea

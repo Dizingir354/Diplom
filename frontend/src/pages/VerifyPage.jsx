@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 const VerifyPage = () => {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     document.getElementById("page-style").setAttribute("href", "/css/verify.css");
@@ -10,6 +11,7 @@ const VerifyPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     console.log("Отправка данных для верификации:", { email, code });
 
     try {
@@ -28,6 +30,7 @@ const VerifyPage = () => {
         throw new Error(data.message || "Ошибка верификации");
       }
 
+      // Сохраняем данные так же, как при логине
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify({
         id: data.userId,
@@ -38,7 +41,7 @@ const VerifyPage = () => {
       window.location.href = "/profile";
     } catch (error) {
       console.error("Ошибка:", error);
-      alert(`Ошибка: ${error.message}`);
+      setError(error.message);
     }
   };
 
@@ -47,6 +50,9 @@ const VerifyPage = () => {
       <div className="verify-box">
         <h1>ПІДТВЕРДЖЕННЯ ПОШТИ</h1>
         <p>Ми надіслали код підтвердження на вашу електронну пошту. Введіть його нижче, щоб продовжити.</p>
+        
+        {error && <p className="error-message">{error}</p>}
+        
         <form onSubmit={handleSubmit}>
           <label htmlFor="email">Електронна пошта</label>
           <input

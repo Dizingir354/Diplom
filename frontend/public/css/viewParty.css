@@ -202,3 +202,27 @@ textarea {
   padding: 20px;
   font-size: 18px;
 }
+
+.chat-box {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.chat-box form {
+  display: flex;
+  gap: 10px;
+}
+
+.chat-box input {
+  flex: 1;
+  padding: 5px;
+}

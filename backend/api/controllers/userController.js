@@ -71,7 +71,19 @@ const verifyEmail = async (req, res) => {
         user.verificationCode = null;
         await user.save();
 
-        res.status(200).json({ message: 'Email успешно подтвержден.' });
+        const token = jwt.sign(
+            { userId: user._id, email: user.email },
+            JWT_SECRET,
+            { expiresIn: TOKEN_EXPIRATION }
+        );
+
+        res.status(200).json({
+            message: 'Email успешно подтвержден.',
+            token,
+            email: user.email,
+            username: user.username,
+            userId: user._id
+        });
     } catch (error) {
         console.error('Ошибка при подтверждении email:', error);
         res.status(500).json({ message: 'Ошибка сервера.' });

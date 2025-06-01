@@ -11,6 +11,10 @@ const mongoose = require('./services/db');
 const partyRoutes = require('./routes/partyRoutes');
 
 const app = express();
+
+const setupSwagger = require('./swagger');
+setupSwagger(app);
+
 const PORT = process.env.PORT || 3000;
 
 // Настраиваем основные middlewares
